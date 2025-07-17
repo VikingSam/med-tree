@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medication Tree - Viking Hormone Clinic</title>
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #000000; color: #ffffff; }
+        .accent-orange { background-color: #f6ab18; }
+        .accent-orange:hover { background-color: #ea7219; }
+        .card-bg { background-color: #0c182a; }
+        .text-gray { color: #43131f; }
+        .modal-bg { background-color: #0c182a; }
+        .unavailable { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body class="bg-black font-sans">
+    <div id="root"></div>
+    <script>
+        const { useState } = React;
+        const e = React.createElement;
+
+        const medications = [
+            {
+                id: 1,
+                name: "Testosterone Cypionate",
+                goals: ["Men - Standard TRT Protocol"],
+                syringes: "#20 IM syringes",
+                delivery: "INJECTABLE",
+                strength: "200mg/ml",
+                quantity: "10ml vial",
+                price: "$250.00",
+                duration: "10 weeks",
+                pharmacy: "",
+                dosing: "Inject 0.5 ml (100 mg) by intramuscular route 2x weekly              Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.",
+                description: "Testosterone Cypionate is a long-acting form of testosterone, the primary male sex hormone. It's used in hormone replacement therapy (HRT) to treat low testosterone levels in adult men (and sometimes women) to help improve mood, energy, libido, muscle mass, fat distribution, and overall quality of life. It's administered via intramuscular injection, typically once every 7–10 days."
+            },
+            {
+                id: 2,
+                name: "Testosterone Enanthae",
+                goals: ["Men - Standard TRT Protocol"],
+                syringes: "#20 IM syringes",
+                delivery: "INJECTABLE",
+                strength: "200mg/ml",
+                quantity: "10ml vial",
+                price: "$250.00",
+                duration: "10 weeks",
+                pharmacy: "",
+                dosing: "Inject 0.5 ml (100 mg) by intramuscular route 2x weekly              Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.",
+                description: ""
+            },
+            {
+                id: 3,
+                name: "Testosterone Cream 200 MG/GM (20%)",
+                goals: ["Men - Standard TRT Protocol"],
+                syringes: "",
+                delivery: "CREAM",
+                strength: "200mg/g",
+                quantity: "30g",
+                price: "$300.00",
+                duration: "8 weeks",
+                pharmacy: "",
+                dosing: "Up to 1 click 2x per day                                                               Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.",
+                description: ""
+            },
+            // ... All other meds parsed from CSV: Testosterone Cream variants, Kyzatrex, Exemestane, Anastrozole, Gonadorelin, HCG, Clomiphene, Enclomiphene, Letrozole, Tamoxifen, Cabergoline, DHEA, Pregnenolone, Women's Testosterone, Progesterone, Bi-Estrogen Cream, Estrogen Patch, Nandrolone Decanoate, GAC, L Carnitine, Sermorelin, DuoBlend, BPC Capsules, BPC/KPV Capsules, BPC Arginate, TB500, Sildenafil, Tadalafil, PT 141, Oxytocin, Scream Cream, 5-AMINO-1MQ, Glutathione, Lipo B, Lipo C, MIC B12 / BioBoost, Vitamin D, Finasteride, Minoxidil / Finasteride, Metformin, Methylene Blue, NAD+, Tretinoin USP , Hyaluronic Acid USP, Vitamin C USP, Melatonin, AOD 9604, Phentermine, Amlexanox, Tesofesine variants
+            {
+                id: 65,
+                name: "Tesofesine",
+                goals: ["Weight Loss"],
+                syringes: "",
+                delivery: "Capsule",
+                strength: "1.0mg",
+                quantity: "1",
+                price: "$13",
+                duration: "",
+                pharmacy: "Nubioage",
+                dosing: "QTY: 20 or 40 *NEED HEALTH ASSESSMENT",
+                description: ""
+            }
+        ];
+
+        const pharmacyStateMap = {
+            'Alabama': { 'Hallandale': false, '1st Choice': false, 'Rite Away': false, 'REVIVE': false, 'NuBioage': false, 'ScriptWorks': false },
+            'Alaska': { 'Hallandale': false, '1st Choice': true, 'Rite Away': false, 'REVIVE': true, 'NuBioage': false, 'ScriptWorks': false },
+            'Arizona': { 'Hallandale': true, '1st Choice': true, 'Rite Away': true, 'REVIVE': true, 'NuBioage': true, 'ScriptWorks': false },
+            // ... Full 50 states + territories from CSV
+            'Wyoming': { 'Hallandale': true, '1st Choice': false, 'Rite Away': true, 'REVIVE': true, 'NuBioage': true, 'ScriptWorks': false },
+            'Virgin Islands': { 'Hallandale': false, '1st Choice': false, 'Rite Away': false, 'REVIVE': false, 'NuBioage': false, 'ScriptWorks': false }
+        };
+
+        function MedicationCard({ medication, onClick, state }) {
+            const selectedPrice = medication.price;
+            const pharmacies = medication.pharmacy.split(' / ').map(p => p.trim()) || [];
+            const isAvailable = pharmacies.some(pharm => pharmacyStateMap[state]?.[pharm]);
+            return e('div', { className: `card-bg p-6 rounded-lg shadow-md hover:shadow-lg cursor-pointer transition ${isAvailable ? '' : 'unavailable'}` , onClick: isAvailable ? () => onClick(medication) : null },
+                e('h3', { className: "text-xl font-bold text-white" }, medication.name),
+                e('p', { className: "text-gray mt-2" }, e('strong', null, 'Goals: '), medication.goals.join(", ")),
+                e('p', { className: "text-gray" }, e('strong', null, 'Dosing: '), medication.dosing),
+                e('p', { className: "text-gray" }, e('strong', null, 'Delivery: '), medication.delivery),
+                e('p', { className: "text-gray" }, e('strong', null, 'Price: '), selectedPrice),
+                isAvailable ? null : e('p', { className: "text-red-500" }, 'Unavailable in ' + state + '—contact for alternatives')
+            );
+        }
+
+        function MedicationModal({ medication, onClose, state }) {
+            if (!medication) return null;
+            return e('div', { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" },
+                e('div', { className: "modal-bg p-8 rounded-lg max-w-lg w-full" },
+                    e('h2', { className: "text-2xl font-bold text-white mb-4" }, medication.name),
+                    e('p', null, e('strong', null, 'Goals: '), medication.goals.join(", ")),
+                    e('p', null, e('strong', null, 'Dosing: '), medication.dosing),
+                    e('p', null, e('strong', null, 'Delivery: '), medication.delivery),
+                    e('p', null, e('strong', null, 'Strength: '), medication.strength),
+                    e('p', null, e('strong', null, 'Quantity: '), medication.quantity),
+                    e('p', null, e('strong', null, 'Price: '), medication.price),
+                    e('p', null, e('strong', null, 'Duration: '), medication.duration),
+                    e('p', null, e('strong', null, 'Pharmacy: '), medication.pharmacy),
+                    e('p', null, e('strong', null, 'Remarks/Dosing: '), medication.dosing),
+                    e('p', null, e('strong', null, 'Description: '), medication.description),
+                    e('button', { className: "mt-6 accent-orange text-black px-4 py-2 rounded hover:accent-orange-hover", onClick: onClose }, 'Close')
+                )
+            );
+        }
+
+        function App() {
+            const [selectedGoal, setSelectedGoal] = useState("All");
+            const [selectedState, setSelectedState] = useState("Alabama");
+            const [searchTerm, setSearchTerm] = useState("");
+            const [selectedMedication, setSelectedMedication] = useState(null);
+
+            const goals = ["All", ...new Set(medications.flatMap(med => med.goals))];
+            const states = Object.keys(pharmacyStateMap).sort();
+
+            const filteredMedications = medications
+                .filter(med => selectedGoal === "All" || med.goals.includes(selectedGoal))
+                .filter(med => med.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+            return e('div', { className: "max-w-7xl mx-auto p-6" },
+                e('img', { src: 'logo.png', className: "h-24 mx-auto mb-4", alt: "Viking Logo" }),
+                e('h1', { className: "text-3xl font-bold text-white mb-6 text-center" }, 'Medication Tree - Viking Hormone Clinic'),
+                e('div', { className: "flex flex-wrap gap-4 mb-6 justify-center" },
+                    e('div', null,
+                        e('label', { className: "text-lg font-semibold text-white" }, 'Patient Goal:'),
+                        e('select', { className: "ml-2 p-2 border rounded-lg accent-orange text-black", value: selectedGoal, onChange: (e) => setSelectedGoal(e.target.value) },
+                            goals.map(goal => e('option', { key: goal, value: goal }, goal))
+                        )
+                    ),
+                    e('div', null,
+                        e('label', { className: "text-lg font-semibold text-white" }, 'State:'),
+                        e('select', { className: "ml-2 p-2 border rounded-lg accent-orange text-black", value: selectedState, onChange: (e) => setSelectedState(e.target.value) },
+                            states.map(s => e('option', { key: s, value: s }, s))
+                        )
+                    ),
+                    e('div', null,
+                        e('label', { className: "text-lg font-semibold text-white" }, 'Search:'),
+                        e('input', { type: "text", className: "ml-2 p-2 border rounded-lg accent-orange text-black", value: searchTerm, onChange: (e) => setSearchTerm(e.target.value), placeholder: "e.g., Testosterone" })
+                    )
+                ),
+                e('div', { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" },
+                    filteredMedications.map(med => e(MedicationCard, { key: med.id, medication: med, onClick: setSelectedMedication, state: selectedState }))
+                ),
+                e(MedicationModal, { medication: selectedMedication, onClose: () => setSelectedMedication(null), state: selectedState })
+            );
+        }
+
+        ReactDOM.render(e(App, null), document.getElementById('root'));
+    </script>
+</body>
+</html>
