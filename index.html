@@ -1,198 +1,177 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medication Tree - Viking Hormone Clinic</title>
-    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #000000; color: #ffffff; }
-        .accent-orange { background-color: #f6ab18; }
-        .accent-orange:hover { background-color: #ea7219; }
-        .card-bg { background-color: #0c182a; }
-        .text-gray { color: #43131f; }
-        .modal-bg { background-color: #0c182a; }
-    </style>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.6">
+  <style type="text/css">
+    body {background-color: #000000}
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; color: #ffffff; -webkit-text-stroke: #ffffff}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; color: #ffffff; -webkit-text-stroke: #ffffff; min-height: 14.0px}
+    span.s1 {font-kerning: none}
+  </style>
 </head>
-<body class="bg-black font-sans">
-    <div id="root"></div>
-    <script>
-        const { useState } = React;
-        const e = React.createElement;
-
-        const medications = [
-            {
-                id: 1,
-                name: "Testosterone Cypionate",
-                goals: ["Retain Muscle", "Improve Libido", "HRT (Men)"],
-                dosing: "200 mg IM every 2 weeks or weekly; cream: 1-2 clicks (10-20 mg) daily",
-                delivery: ["Injectable", "Cream"],
-                price: { "CA": "$190-$365", "Other": "$170-$300" },
-                summary: "Treats hypogonadism and low T levels, boosting muscle, strength, and libido in men; low doses for women in HRT.",
-                pairings: ["Anastrozole (0.25-0.5 mg 2x weekly)", "Primobolan for enhanced muscle growth"]
-            },
-            {
-                id: 2,
-                name: "Estrogen Patch",
-                goals: ["Manage Menopause Symptoms", "Improve Bone Health"],
-                dosing: "0.0375-0.1 mg/24hr patch, 2 per week; ultra-low 0.014 mg/day weekly for bone focus",
-                delivery: ["Patch"],
-                price: { "CA": "$100/4 weeks", "Other": "$100/4 weeks" },
-                summary: "Eases hot flashes, vaginal dryness; boosts BMD to cut osteoporosis risk in postmenopausal women.",
-                pairings: ["Progestogen (if uterus present)", "Exercise for max bone protection"]
-            },
-            {
-                id: 3,
-                name: "Semaglutide",
-                goals: ["Weight Loss"],
-                dosing: "Start 0.25 mg weekly, up to 2.4 mg; with diet/exercise",
-                delivery: ["Injectable"],
-                price: { "CA": "$1199.99 or $599.99/month", "Other": "$1199.99 or $599.99/month" },
-                summary: "GLP-1 agonist for obesity and T2 diabetes; slashes appetite, aids major weight loss.",
-                pairings: ["Diet and exercise", "B12 for energy"]
-            },
-            {
-                id: 4,
-                name: "Tirzepatide",
-                goals: ["Weight Loss"],
-                dosing: "Start 2.5 mg weekly, up to 15 mg; subQ injection",
-                delivery: ["Injectable"],
-                price: { "CA": "$1399.99 or $699.99/month", "Other": "$1399.99 or $699.99/month" },
-                summary: "Dual GIP/GLP-1 agonist; drives big weight drops (up to 52 lbs at 15 mg) in obesity.",
-                pairings: ["Lifestyle changes", "Metformin if diabetic"]
-            },
-            {
-                id: 5,
-                name: "HCG",
-                goals: ["Improve Libido", "Fertility"],
-                dosing: "1000-4000 IU 3x/week; pair with TRT for fertility maintenance",
-                delivery: ["Injectable"],
-                price: { "CA": "Varies by pharmacy", "Other": "Varies by pharmacy" },
-                summary: "Boosts T production, sperm count, libido; key in TRT to preserve fertility and testicular size.",
-                pairings: ["Clomiphene (25 mg/day)", "TRT protocols"]
-            },
-            {
-                id: 6,
-                name: "Sermorelin",
-                goals: ["Retain Muscle", "HRT (Men)"],
-                dosing: "0.1-0.5 mg daily subQ, before bed; 5 days/week cycle",
-                delivery: ["Injectable"],
-                price: { "CA": "Varies by pharmacy", "Other": "Varies by pharmacy" },
-                summary: "GH secretagogue for muscle growth, recovery, anti-aging; FDA-ok'd alternative to peptides.",
-                pairings: ["GHRP-2 for synergy", "Strength training"]
-            }
-        ];
-
-        function MedicationCard({ medication, onClick, state }) {
-            const selectedPrice = medication.price[state] || medication.price["Other"];
-            return e('div', { className: "bg-white p-6 rounded-lg shadow-md hover:shadow-lg cursor-pointer transition", onClick: () => onClick(medication) },
-                e('h3', { className: "text-xl font-bold text-gray-800" }, medication.name),
-                e('p', { className: "text-gray-600 mt-2" }, e('strong', null, 'Goals: '), medication.goals.join(", ")),
-                e('p', { className: "text-gray-600" }, e('strong', null, 'Dosing: '), medication.dosing),
-                e('p', { className: "text-gray-600" }, e('strong', null, 'Delivery: '), medication.delivery.join(", ")),
-                e('p', { className: "text-gray-600" }, e('strong', null, `Price (${state}): `), selectedPrice)
-            );
-        }
-
-        function MedicationModal({ medication, onClose, state }) {
-            if (!medication) return null;
-            const selectedPrice = medication.price[state] || medication.price["Other"];
-            return e('div', { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" },
-                e('div', { className: "bg-white p-8 rounded-lg max-w-lg w-full" },
-                    e('h2', { className: "text-2xl font-bold text-gray-800 mb-4" }, medication.name),
-                    e('p', null, e('strong', null, 'Goals: '), medication.goals.join(", ")),
-                    e('p', null, e('strong', null, 'Dosing: '), medication.dosing),
-                    e('p', null, e('strong', null, 'Delivery: '), medication.delivery.join(", ")),
-                    e('p', null, e('strong', null, `Price (${state}): `), selectedPrice),
-                    e('p', null, e('strong', null, 'Summary: '), medication.summary),
-                    e('p', null, e('strong', null, 'Recommended Pairings: '), medication.pairings.join(", ")),
-                    e('button', { className: "mt-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600", onClick: onClose }, 'Close')
-                )
-            );
-        }
-
-        function App() {
-            const [selectedGoal, setSelectedGoal] = useState("All");
-            const [selectedState, setSelectedState] = useState("Other");
-            const [searchTerm, setSearchTerm] = useState("");
-            const [selectedMedication, setSelectedMedication] = useState(null);
-
-            const goals = ["All", ...new Set(medications.flatMap(med => med.goals))];
-            const states = ["CA", "Other"];
-
-            const filteredMedications = medications
-                .filter(med => selectedGoal === "All" || med.goals.includes(selectedGoal))
-                .filter(med => med.name.toLowerCase().includes(searchTerm.toLowerCase()));
-
-            return e('div', { className: "max-w-7xl mx-auto p-6" },
-                e('h1', { className: "text-3xl font-bold text-gray-900 mb-6" }, 'Medication Tree - Viking Hormone Clinic'),
-                e('div', { className: "flex flex-wrap gap-4 mb-6" },
-                    e('div', null,
-                        e('label', { className: "text-lg font-semibold text-gray-700" }, 'Patient Goal:'),
-                        e('select', { className: "ml-2 p-2 border rounded-lg", value: selectedGoal, onChange: (e) => setSelectedGoal(e.target.value) },
-                            goals.map(goal => e('option', { key: goal, value: goal }, goal))
-                        )
-                    ),
-                    e('div', null,
-                        e('label', { className: "text-lg font-semibold text-gray-700" }, 'State:'),
-                        e('select', { className: "ml-2 p-2 border rounded-lg", value: selectedState, onChange: (e) => setSelectedState(e.target.value) },
-                            states.map(s => e('option', { key: s, value: s }, s))
-                        )
-                    ),
-                    e('div', null,
-                        e('label', { className: "text-lg font-semibold text-gray-700" }, 'Search:'),
-                        e('input', { type: "text", className: "ml-2 p-2 border rounded-lg", value: searchTerm, onChange: (e) => setSearchTerm(e.target.value), placeholder: "e.g., Testosterone" })
-                    )
-                ),
-                e('div', { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" },
-                    filteredMedications.map(med => e(MedicationCard, { key: med.id, medication: med, onClick: setSelectedMedication, state: selectedState }))
-                ),
-                e(MedicationModal, { medication: selectedMedication, onClose: () => setSelectedMedication(null), state: selectedState })
-            );
-        }
-
-        ReactDOM.render(e(App, null), document.getElementById('root'));
-    </script>
+<body>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html lang="en"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;head&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;title&gt;Medication Tree - Viking Hormone Clinic&lt;/title&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"&gt;&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"&gt;&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;style&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>body { background-color: #000000; color: #ffffff; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.accent-orange { background-color: #f6ab18; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.accent-orange:hover { background-color: #ea7219; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.card-bg { background-color: #0c182a; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.text-gray { color: #43131f; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.modal-bg { background-color: #0c182a; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body class="bg-black font-sans"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="root"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const { useState } = React;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const e = React.createElement;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const medications = [</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>id: 1,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>name: "Testosterone Cypionate",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>goals: ["Retain Muscle", "Improve Libido", "HRT (Men)"],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>dosing: "200 mg IM every 2 weeks or weekly; cream: 1-2 clicks (10-20 mg) daily",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>delivery: ["Injectable", "Cream"],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>price: { "CA": "$190-$365", "Other": "$170-$300" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>summary: "Treats hypogonadism and low T levels, boosting muscle, strength, and libido in men; low doses for women in HRT.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>pairings: ["Anastrozole (0.25-0.5 mg 2x weekly)", "Primobolan for enhanced muscle growth"]</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>id: 2,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>name: "Estrogen Patch",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>goals: ["Manage Menopause Symptoms", "Improve Bone Health"],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>dosing: "0.0375-0.1 mg/24hr patch, 2 per week; ultra-low 0.014 mg/day weekly for bone focus",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>delivery: ["Patch"],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>price: { "CA": "$100/4 weeks", "Other": "$100/4 weeks" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>summary: "Eases hot flashes, vaginal dryness; boosts BMD to cut osteoporosis risk in postmenopausal women.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>pairings: ["Progestogen (if uterus present)", "Exercise for max bone protection"]</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>id: 3,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>name: "Semaglutide",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>goals: ["Weight Loss"],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>dosing: "Start 0.25 mg weekly, up to 2.4 mg; with diet/exercise",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>delivery: ["Injectable"],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>price: { "CA": "$1199.99 or $599.99/month", "Other": "$1199.99 or $599.99/month" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>summary: "GLP-1 agonist for obesity and T2 diabetes; slashes appetite, aids major weight loss.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>pairings: ["Diet and exercise", "B12 for energy"]</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>id: 4,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>name: "Tirzepatide",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>goals: ["Weight Loss"],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>dosing: "Start 2.5 mg weekly, up to 15 mg; subQ injection",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>delivery: ["Injectable"],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>price: { "CA": "$1399.99 or $699.99/month", "Other": "$1399.99 or $699.99/month" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>summary: "Dual GIP/GLP-1 agonist; drives big weight drops (up to 52 lbs at 15 mg) in obesity.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>pairings: ["Lifestyle changes", "Metformin if diabetic"]</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>id: 5,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>name: "HCG",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>goals: ["Improve Libido", "Fertility"],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>dosing: "1000-4000 IU 3x/week; pair with TRT for fertility maintenance",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>delivery: ["Injectable"],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>price: { "CA": "Varies by pharmacy", "Other": "Varies by pharmacy" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>summary: "Boosts T production, sperm count, libido; key in TRT to preserve fertility and testicular size.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>pairings: ["Clomiphene (25 mg/day)", "TRT protocols"]</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>},</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>{</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>id: 6,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>name: "Sermorelin",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>goals: ["Retain Muscle", "HRT (Men)"],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>dosing: "0.1-0.5 mg daily subQ, before bed; 5 days/week cycle",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>delivery: ["Injectable"],</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>price: { "CA": "Varies by pharmacy", "Other": "Varies by pharmacy" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>summary: "GH secretagogue for muscle growth, recovery, anti-aging; FDA-ok'd alternative to peptides.",</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>pairings: ["GHRP-2 for synergy", "Strength training"]</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>];</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function MedicationCard({ medication, onClick, state }) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const selectedPrice = medication.price[state] || medication.price["Other"];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>return e('div', { className: "bg-white p-6 rounded-lg shadow-md hover:shadow-lg cursor-pointer transition", onClick: () =&gt; onClick(medication) },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e('h3', { className: "text-xl font-bold text-gray-800" }, medication.name),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e('p', { className: "text-gray-600 mt-2" }, e('strong', null, 'Goals: '), medication.goals.join(", ")),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e('p', { className: "text-gray-600" }, e('strong', null, 'Dosing: '), medication.dosing),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e('p', { className: "text-gray-600" }, e('strong', null, 'Delivery: '), medication.delivery.join(", ")),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e('p', { className: "text-gray-600" }, e('strong', null, `Price (${state}): `), selectedPrice)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function MedicationModal({ medication, onClose, state }) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (!medication) return null;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const selectedPrice = medication.price[state] || medication.price["Other"];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>return e('div', { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e('div', { className: "bg-white p-8 rounded-lg max-w-lg w-full" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>e('h2', { className: "text-2xl font-bold text-gray-800 mb-4" }, medication.name),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>e('p', null, e('strong', null, 'Goals: '), medication.goals.join(", ")),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>e('p', null, e('strong', null, 'Dosing: '), medication.dosing),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>e('p', null, e('strong', null, 'Delivery: '), medication.delivery.join(", ")),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>e('p', null, e('strong', null, `Price (${state}): `), selectedPrice),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>e('p', null, e('strong', null, 'Summary: '), medication.summary),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>e('p', null, e('strong', null, 'Recommended Pairings: '), medication.pairings.join(", ")),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>e('button', { className: "mt-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600", onClick: onClose }, 'Close')</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function App() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const [selectedGoal, setSelectedGoal] = useState("All");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const [selectedState, setSelectedState] = useState("Other");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const [searchTerm, setSearchTerm] = useState("");</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const [selectedMedication, setSelectedMedication] = useState(null);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const goals = ["All", ...new Set(medications.flatMap(med =&gt; med.goals))];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const states = ["CA", "Other"];</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const filteredMedications = medications</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>.filter(med =&gt; selectedGoal === "All" || med.goals.includes(selectedGoal))</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>.filter(med =&gt; med.name.toLowerCase().includes(searchTerm.toLowerCase()));</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>return e('div', { className: "max-w-7xl mx-auto p-6" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e('h1', { className: "text-3xl font-bold text-gray-900 mb-6" }, 'Medication Tree - Viking Hormone Clinic'),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e('div', { className: "flex flex-wrap gap-4 mb-6" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>e('div', null,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>e('label', { className: "text-lg font-semibold text-gray-700" }, 'Patient Goal:'),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>e('select', { className: "ml-2 p-2 border rounded-lg", value: selectedGoal, onChange: (e) =&gt; setSelectedGoal(e.target.value) },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>goals.map(goal =&gt; e('option', { key: goal, value: goal }, goal))</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>e('div', null,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>e('label', { className: "text-lg font-semibold text-gray-700" }, 'State:'),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>e('select', { className: "ml-2 p-2 border rounded-lg", value: selectedState, onChange: (e) =&gt; setSelectedState(e.target.value) },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>states.map(s =&gt; e('option', { key: s, value: s }, s))</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>e('div', null,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>e('label', { className: "text-lg font-semibold text-gray-700" }, 'Search:'),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>e('input', { type: "text", className: "ml-2 p-2 border rounded-lg", value: searchTerm, onChange: (e) =&gt; setSearchTerm(e.target.value), placeholder: "e.g., Testosterone" })</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>)</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e('div', { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>filteredMedications.map(med =&gt; e(MedicationCard, { key: med.id, medication: med, onClick: setSelectedMedication, state: selectedState }))</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>),</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>e(MedicationModal, { medication: selectedMedication, onClose: () =&gt; setSelectedMedication(null), state: selectedState })</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>ReactDOM.render(e(App, null), document.getElementById('root'));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
 </body>
 </html>
