@@ -126,44 +126,43 @@
 
       const getMedicationDescription = (medication) => {
         const descriptions = {
-          'Testosterone Cypionate': 'Used for testosterone replacement therapy (TRT) to treat low testosterone levels. May improve energy, muscle mass, and libido. Potential side effects: acne, hair loss, or mood changes.',
-          'Anastrozole': 'Aromatase inhibitor to reduce estrogen levels in TRT patients. May prevent gynecomastia. Side effects: joint pain, hot flashes.',
-          'Bi-Estrogen Cream': 'Hormone replacement for women to alleviate menopausal symptoms like hot flashes. Side effects: breast tenderness, nausea.',
-          'Progesterone': 'Supports hormonal balance in women, often used in HRT. May improve sleep and mood. Side effects: bloating, mood swings.',
-          'Clomiphene (Clomid)': 'Stimulates ovulation in women or testosterone production in men. Side effects: hot flashes, headaches.',
-          'Estrogen Patch': 'Transdermal hormone replacement for menopause symptoms. Potential side effects: skin irritation, headache, breast pain.',
-          'DHEA': 'Precursor to sex hormones. May boost energy and mood. Side effects: acne, hair growth, upset stomach.',
-          'Pregnenolone': 'Precursor hormone for steroids. May aid cognition and stress response. Side effects: overstimulation, irritability.',
-          'Nandrolone Decanoate': 'Anabolic steroid for joint pain and muscle growth. Side effects: water retention, acne, liver issues.',
-          'L Carnitine': 'Aids fat transport for energy. May improve recovery. Side effects: nausea, vomiting, diarrhea.',
-          'Sermorelin': 'Growth hormone-releasing hormone analog for anti-aging. Side effects: injection site reactions, headache.',
-          'Duollent CJC 1295/Ipamorelin': 'Peptide blend for GH release. Side effects: water retention, numbness.',
-          'BPC Capsules': 'Body protection compound for healing. Side effects: fatigue, dizziness.',
-          'BPC PV Capsules': 'Variant for gut healing. Side effects: similar to BPC.',
-          'BPC Arginate (PentaDecaPeptide)': 'Stable BPC for oral use. Side effects: minimal reported.',
-          'TB500 (Thymosin Beta 4)': 'Peptide for tissue repair. Side effects: temporary redness, discomfort.',
-          'Sildenafil (Viagra)': 'PDE5 inhibitor for ED. Side effects: headache, flushing, indigestion.',
-          'Tadalafil (Cialis)': 'Longer-acting PDE5 inhibitor. Side effects: back pain, muscle aches.',
-          'PT 141 (Bremelanotide)': 'Melanocortin agonist for libido. Side effects: nausea, flushing.',
-          'Oxytocin': 'Hormone for bonding and arousal. Side effects: rapid heartbeat, nausea.',
-          'Scream Cream': 'Topical blend for female arousal. Side effects: burning, itching.',
-          'Aminos-1MG': 'Amino acid supplement. Side effects: digestive upset.',
-          'DAC Amino L-Glutamine L-Arginine L-': 'Blend for recovery. Side effects: stomach cramps.',
-          'Glutathione': 'Antioxidant for detox. Side effects: cramping, bloating.',
-          'Lipo B': 'Lipotropic injection for weight loss. Side effects: site pain, diarrhea.',
-          'MIC B12/BioBoost': 'Methionine inositol choline with B12. Side effects: nausea, headache.',
-          'Vitamin B12 D': 'Vitamin injection for energy. Side effects: acne, rash.',
-          'Lipo C': 'Lipotropic with carnitine. Side effects: similar to Lipo B.',
-          'Finasteride / Minoxidil': 'Hair loss treatment combo. Side effects: scalp irritation, sexual dysfunction (finasteride).',
+          'Testosterone Cypionate': 'Used for TRT to treat low testosterone. Improves energy, muscle, libido. Side effects: acne, hair loss, mood changes.',
+          'Anastrozole': 'Reduces estrogen in TRT patients. Prevents gynecomastia. Side effects: joint pain, hot flashes.',
+          'Bi-Estrogen Cream': 'HRT for menopause symptoms like hot flashes. Side effects: weight gain, blurred vision, tiredness, acne.',
+          'Progesterone': 'Supports hormonal balance in HRT. Improves sleep, mood. Side effects: abdominal pain, bloating, blurred vision, nausea.',
+          'Clomiphene (Clomid)': 'Stimulates testosterone in men or ovulation in women. Side effects: hot flashes, headaches.',
+          'Estrogen Patch': 'HRT for menopause. Reduces hot flashes, vaginal dryness. Side effects: bloating, breast tenderness, headaches, nausea.',
+          'DHEA': 'Supports hormone production. May improve energy, mood. Side effects: oily skin, acne, hair loss, upset stomach.',
+          'Pregnenolone': 'Precursor hormone for others. May aid memory, mood. Side effects: overstimulation, insomnia, irritability, acne, headache.',
+          'Nandrolone Decanoate': 'For joint pain, muscle wasting. Relieves hypogonadal joint pain. Side effects: headaches, acne, diarrhea, edema.',
+          'L Carnitine': 'Aids fat burning, energy. For healing, performance. Side effects: stomach upset, heartburn, diarrhea, seizures.',
+          'Sermorelin': 'Stimulates growth hormone release. Anti-aging, energy. Side effects: injection site reactions, headache, flushing, nausea.',
+          'CJC 1295/Ipamorelin': 'Boosts GH for muscle, fat loss. Side effects: headaches, flu-like symptoms, irritability, nausea.',
+          'BPC Capsules': 'Promotes healing, wound repair. For tendons, ligaments. Side effects: unknown in humans, potential injection reactions.',
+          'TB500 (Thymosin Beta 4)': 'Aids tissue repair, flexibility. Side effects: fatigue, headaches, dizziness, injection site irritation.',
+          'Sildenafil (Viagra)': 'Treats ED by increasing blood flow. Side effects: headache, flushing, nausea, stuffy nose.',
+          'Tadalafil (Cialis)': 'Treats ED, longer-lasting. Side effects: headache, flushing, back pain, nausea.',
+          'PT 141 (Bremelanotide)': 'Boosts libido, arousal. Side effects: nausea (common), vomiting, flushing, headache.',
+          'Oxytocin': 'Enhances bonding, may aid sexual function. Side effects: headache, nausea, vomiting, rapid heartbeat.',
+          'Scream Cream': 'Topical for female arousal. Side effects: itching, redness, dryness, dizziness, headaches.',
+          'Aminos-1MG': 'Amino acid blend for recovery. Side effects: nausea, abdominal pain, vomiting, diarrhea.',
+          'DAC Amino L-Glutamine L-Arginine L-Carnitine': 'Supports recovery, energy. Side effects: stomach upset, diarrhea, bloating.',
+          'Glutathione': 'Antioxidant for detox, skin. Side effects: rash (topical), nausea, abdominal cramps (injections).',
+          'Lipo B': 'Fat-burning injection with B vitamins. Side effects: allergic reactions, anxiety, constipation, diarrhea.',
+          'MIC B12/BioBoost': 'Weight loss blend with B12. Side effects: pain at site, nausea, vomiting, diarrhea.',
+          'Vitamin B12 D': 'For energy, deficiency. Side effects: mild diarrhea, itching, swelling sensation.',
+          'Lipo C': 'Lipotropic for fat loss. Side effects: pain/swelling at site, nausea, gastrointestinal issues.',
+          'Finasteride / Minoxidil': 'For hair loss. Finasteride blocks DHT; Minoxidil promotes growth. Side effects: itching, scalp irritation, sexual dysfunction (finasteride).',
           'Metformin': 'Blood sugar control for weight loss. Side effects: nausea, diarrhea.',
           'Phentermine': 'Appetite suppressant. Side effects: dry mouth, insomnia.',
-          'Sermorelin': 'As above.',
-          'Semaglutide': 'GLP-1 agonist for weight loss. Side effects: nausea, constipation.'
+          'Sermorelin': 'Stimulates growth hormone for anti-aging. Side effects: injection site reactions, headache.',
+          'Semaglutide': 'For weight loss, reduces appetite. Side effects: nausea, diarrhea, vomiting, constipation.'
         };
         return descriptions[medication] || 'No description available.';
       };
-React.useEffect(() => {
-  const caCsvData = `CA* MEN - HRT Protocols💉,,,,,,,,,CA * WOMEN - HRT Protocols 💉,,,,,,,,,,,,,,,,,,,,
+
+      React.useEffect(() => {
+        const caCsvData = `CA* MEN - HRT Protocols💉,,,,,,,,,CA * WOMEN - HRT Protocols 💉,,,,,,,,,,,,,,,,,,,,
 $100 CONSULT FEE FOR ALL NON TESTOSTERONE PATIENTS,,,,,,,,,$100 CONSULT FEE FOR ALL NON TESTOSTERONE PATIENTS,,,,,,,,,,,,,,,,,,,,
 Medication,Syringes,Type,Strength,Quantity,Price,,Standard Dosing,,Medication,Syringes,Type,Strength,Quantity,Price,,Standard Dosing,,,,,,,,,,,,,
 Testosterone Cypionate                  Anastorozole Tablets #10,#20 IM syringes,INJECTABLE,200mg/ml,10ml vial,$275.00,10 weeks,Inject 0.5 ml (100 mg) by intramuscular route 2x weekly              Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.,,Testosterone Cypionate                 ,#10 Insulin syringes,INJECTABLE,50mg/ml,5ml vial,$190.00,10 weeks,,,,,,,,,,,,,,
@@ -263,7 +262,7 @@ Pregnenolone,,SR Capsule,100mg,1,$1.50,,
 Testosterone Cypionate,,INJECTABLE,50mg/ml,5ml vial,$170.00,10 weeks,#10 Insulin syringes,1 Click daily
 Testosterone Cypionate (1%),,CREAM,10mg/g,15g,$230.00,8 weeks,,1 Click daily
 Testosterone Cypionate (1%),,CREAM,10mg/g,30g,$230.00,8 weeks,,1 Click 2x daily
-Testosterone Cypionate (1%),,,10mg/g,60g,$255.00,8 weeks,,2 clicks 2x daily
+Testosterone Cypionate (1%),,CREAM,10mg/g,60g,$255.00,8 weeks,,2 clicks 2x daily
 Progesterone,,Capsule,50mg,1,$1.00,,
 Progesterone,,Capsule,100mg,1,$1.00,,
 Progesterone,,Capsule,200mg,1,$1.50,,
