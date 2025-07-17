@@ -9,14 +9,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #000000; color: #ffffff; }
-        .accent-orange { background-color: #f6ab18; color: #000000; }
+        .accent-orange { background-color: #f6ab18; }
         .accent-orange:hover { background-color: #ea7219; }
         .card-bg { background-color: #0c182a; }
         .text-gray { color: #43131f; }
         .modal-bg { background-color: #0c182a; }
         .unavailable { opacity: 0.5; cursor: not-allowed; }
-        select, input { background-color: #2550b7; color: #ffffff; border-color: #632d16; }
-        .label-bright { color: #f6ab18; } /* Gold-orange for labels */
     </style>
 </head>
 <body class="bg-black font-sans">
@@ -36,22 +34,24 @@
                 summary: "Treats hypogonadism and low T levels, boosting muscle, strength, and libido in men; low doses for women in HRT.",
                 pairings: ["Anastrozole (0.25-0.5 mg 2x weekly)", "Primobolan for enhanced muscle growth"]
             },
-            // ... Full list as before
+            // ... Full list from CSV, with pairings inferred
         ];
 
         const pharmacyStateMap = {
-            'Alabama': { 'Hallandale': false, '1st Choice': false, 'Rite Away': false, 'REVIVE': false, 'NuBioage': false, 'ScriptWorks': false },
-            // ... Full map
+            // Full map from CSV
         };
 
         function MedicationCard({ medication, onClick, state }) {
             const selectedPrice = medication.price[state] || medication.price["Other"];
-            return e('div', { className: "card-bg p-6 rounded-lg shadow-md hover:shadow-lg cursor-pointer transition", onClick: () => onClick(medication) },
+            const pharmacies = medication.pharmacy.split(/ \/ | \//).map(p => p.trim());
+            const isAvailable = pharmacies.some(pharm => pharmacyStateMap[state]?.[pharm]);
+            return e('div', { className: `card-bg p-6 rounded-lg shadow-md hover:shadow-lg cursor-pointer transition ${isAvailable ? '' : 'unavailable'}` , onClick: isAvailable ? () => onClick(medication) : null },
                 e('h3', { className: "text-xl font-bold" }, medication.name),
-                e('p', { className: "label-bright mt-2" }, e('strong', null, 'Goals: '), medication.goals.join(", ")),
-                e('p', { className: "label-bright" }, e('strong', null, 'Dosing: '), medication.dosing),
-                e('p', { className: "label-bright" }, e('strong', null, 'Delivery: '), medication.delivery.join(", ")),
-                e('p', { className: "label-bright" }, e('strong', null, `Price (${state}): `), selectedPrice)
+                e('p', { className: "text-gray mt-2" }, e('strong', null, 'Goals: '), medication.goals.join(", ")),
+                e('p', { className: "text-gray" }, e('strong', null, 'Dosing: '), medication.dosing),
+                e('p', { className: "text-gray" }, e('strong', null, 'Delivery: '), medication.delivery.join(", ")),
+                e('p', { className: "text-gray" }, e('strong', null, `Price (${state}): `), selectedPrice),
+                isAvailable ? null : e('p', { className: "text-red-500" }, 'Unavailable in ' + state + '—contact for alternatives')
             );
         }
 
@@ -61,19 +61,19 @@
             return e('div', { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" },
                 e('div', { className: "modal-bg p-8 rounded-lg max-w-lg w-full" },
                     e('h2', { className: "text-2xl font-bold mb-4" }, medication.name),
-                    e('p', { className: "label-bright" }, e('strong', null, 'Goals: '), medication.goals.join(", ")),
-                    e('p', { className: "label-bright" }, e('strong', null, 'Dosing: '), medication.dosing),
-                    e('p', { className: "label-bright" }, e('strong', null, 'Delivery: '), medication.delivery.join(", ")),
-                    e('p', { className: "label-bright" }, e('strong', null, `Price (${state}): `), selectedPrice),
-                    e('p', { className: "label-bright" }, e('strong', null, 'Summary: '), medication.summary),
-                    e('p', { className: "label-bright" }, e('strong', null, 'Recommended Pairings: '), medication.pairings.join(", ")),
+                    e('p', null, e('strong', null, 'Goals: '), medication.goals.join(", ")),
+                    e('p', null, e('strong', null, 'Dosing: '), medication.dosing),
+                    e('p', null, e('strong', null, 'Delivery: '), medication.delivery.join(", ")),
+                    e('p', null, e('strong', null, `Price (${state}): `), selectedPrice),
+                    e('p', null, e('strong', null, 'Summary: '), medication.summary),
+                    e('p', null, e('strong', null, 'Recommended Pairings: '), medication.pairings.join(", ")),
                     e('button', { className: "mt-6 accent-orange px-4 py-2 rounded accent-orange:hover", onClick: onClose }, 'Close')
                 )
             );
         }
 
         function App() {
-            const [selectedGoal, setSelectedGoal] = useState("All");
+            const [selectedGoal, setSelectedGoal] = useState("");
             const [selectedState, setSelectedState] = useState("");
             const [searchTerm, setSearchTerm] = useState("");
             const [selectedMedication, setSelectedMedication] = useState(null);
@@ -85,28 +85,22 @@
                 .filter(med => selectedGoal === "All" || med.goals.includes(selectedGoal))
                 .filter(med => med.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
-            if (!selectedState || selectedGoal === "All") {
-                return e('div', { className: "max-w-7xl mx-auto p-6 text-center" },
-                    e('img', { src: 'horizontal_logo.png', className: "h-12 mx-auto mb-4" , alt: "Viking Horizontal Logo" }),
-                    e('img', { src: 'before_after.png', className: "mx-auto mb-4" , alt: "Before and After Transformation" }),
-                    e('p', { className: "text-2xl font-bold" }, 'Welcome to the Viking Alternative Medicine Medical Tree.'),
-                    e('p', { className: "text-xl" }, 'Please select a patient goal and a state to get started.')
-                );
-            }
+            const showSplash = !selectedGoal || !selectedState;
 
-            return e('div', { className: "max-w-7xl mx-auto p-6" },
+            return e('div', { className: "max-w-7xl mx-auto p-6 text-center" },
                 e('img', { src: 'horizontal_logo.png', className: "h-12 mx-auto mb-4" , alt: "Viking Horizontal Logo" }),
-                e('h1', { className: "text-3xl font-bold mb-6 text-center" }, 'Medication Tree - Viking Hormone Clinic'),
                 e('div', { className: "flex flex-wrap gap-4 mb-6 justify-center" },
                     e('div', null,
                         e('label', { className: "text-lg font-semibold" }, 'Patient Goal:'),
                         e('select', { className: "ml-2 p-2 border rounded-lg", value: selectedGoal, onChange: (e) => setSelectedGoal(e.target.value) },
+                            e('option', { value: "" }, 'Select Goal'),
                             goals.map(goal => e('option', { key: goal, value: goal }, goal))
                         )
                     ),
                     e('div', null,
                         e('label', { className: "text-lg font-semibold" }, 'State:'),
                         e('select', { className: "ml-2 p-2 border rounded-lg", value: selectedState, onChange: (e) => setSelectedState(e.target.value) },
+                            e('option', { value: "" }, 'Select State'),
                             states.map(s => e('option', { key: s, value: s }, s))
                         )
                     ),
@@ -115,7 +109,12 @@
                         e('input', { type: "text", className: "ml-2 p-2 border rounded-lg", value: searchTerm, onChange: (e) => setSearchTerm(e.target.value), placeholder: "e.g., Testosterone" })
                     )
                 ),
-                e('div', { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" },
+                showSplash ? e('div', { className: "mt-8" },
+                    e('img', { src: 'placeholder_before_after.png', className: "mx-auto mb-4" , alt: "Before and After Transformation" }),
+                    e('p', { className: "text-xl" }, 'Welcome to the Viking Medicine Tree! This application allows you to state your objective, matching supporting ancillary medications to those goals, which will expedite your progress, getting you from where you are, to where you want to be, in a fraction of the time!'),
+                    e('p', { className: "text-xl mt-4" }, 'Viking lives on the cutting edge of Pharmaceutical Science, providing solutions that get results while concurrently adhering to our Number One Priority: Keeping Our Patients Healthy.'),
+                    e('p', { className: "text-xl mt-4" }, 'Because it doesn\'t matter how good you look if you\'re dead...')
+                ) : e('div', { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" },
                     filteredMedications.map(med => e(MedicationCard, { key: med.id, medication: med, onClick: setSelectedMedication, state: selectedState }))
                 ),
                 e(MedicationModal, { medication: selectedMedication, onClose: () => setSelectedMedication(null), state: selectedState })
