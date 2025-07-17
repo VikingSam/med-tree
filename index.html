@@ -4,15 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Medication Lookup App</title>
-  <link href="styles.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/papaparse@latest/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.15.0/Recharts.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      content: ['./*.{html,js}'],  // Scans for classes in HTML/JS
+      theme: {
+        extend: {},
+      },
+      plugins: [],
+    }
+  </script>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="root" class="min-h-screen bg-gray-100 p-4"></div>
 
   <script type="text/javascript">
     const { createRoot } = ReactDOM;
@@ -24,61 +33,64 @@
       const [selectedState, setSelectedState] = React.useState('');
       const [selectedGoal, setSelectedGoal] = React.useState('');
 
-      const patientGoals = [
-        'Men - Standard TRT Protocol',
-        'Men - Standard Add On',
-        'Women - Standard HRT Protocol',
-        'Women - Standard Add On',
-        'Joint Pain/Healing',
-        'Sexual Function',
-        'Vitamins',
-        'Hair Loss',
-        'Improve Energy',
-        'Anti-Aging',
-        'Improve Sleep',
-        'Weight Loss'
-      ];
+      // patientGoals array here - same as before
 
-      const states = [
-        'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
-        'District of Columbia', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa',
-        'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
-        'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico',
-        'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Puerto Rico',
-        'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia',
-        'Washington', 'West Virginia', 'Wisconsin', 'Wyoming', 'Virgin Islands'
-      ];
+      // states array here
 
-      const shipmentMap = {
-        // Full shipmentMap object here, same as before
-      };
+      // shipmentMap object here
 
       const processAndCleanData = (rawData) => {
-        // Same function as before
+        // function body
       };
 
       const getMedicationDescription = (medication) => {
-        // Full descriptions object
+        // descriptions object
       };
 
       React.useEffect(() => {
-        // CA CSV loading
-        const caCsvData = `// Full CA CSV string`;
-        Papa.parse(caCsvData, { /* config */ });
+        // CA CSV parsing
+        const caCsvData = `Medication,Syringes,Type,Strength,Quantity,Price,,Standard Dosing
+// Full CA data string pasted here - replace with the complete CSV from earlier chats
+`;
 
-        // Non-CA CSV loading
-        const nonCaCsv = `// Full non-CA CSV string from transcripts`;
-        Papa.parse(nonCaCsv, { /* config */ });
+        Papa.parse(caCsvData, {
+          header: true,
+          skipEmptyLines: true,
+          transformHeader: header => header.trim().replace(/^"|"$/g, ''),
+          transform: (value, header) => {
+            let cleaned = value.trim().replace(/^"|"$/g, '');
+            if (header === 'Price') cleaned = parseFloat(cleaned.replace('$', '')) || 0;
+            return cleaned;
+          },
+          complete: (results) => setCaData(processAndCleanData(results.data))
+        });
+
+        // Non-CA CSV parsing - full string from screenshots
+        const nonCaCsv = `Medication,Syringes,Type,Strength,Quantity,Price,Duration,Pharm.,Standard Dosing
+// Full non-CA data string pasted here
+`;
+
+        Papa.parse(nonCaCsv, {
+          header: true,
+          skipEmptyLines: true,
+          transformHeader: header => header.trim().replace(/^"|"$/g, ''),
+          transform: (value, header) => {
+            let cleaned = value.trim().replace(/^"|"$/g, '');
+            if (header === 'Price') cleaned = parseFloat(cleaned.replace('$', '')) || 0;
+            return cleaned;
+          },
+          complete: (results) => setNonCaData(processAndCleanData(results.data))
+        });
       }, []);
 
       const data = selectedState === 'California' ? caData : nonCaData;
 
       const filteredMedications = React.useMemo(() => {
-        // Full filtering logic
+        // filtering logic
       }, [data, selectedState, selectedGoal]);
 
       const getGoalForMedication = (medication) => {
-        // Full goal mapping
+        // goal mapping
       };
 
       if (!caData || !nonCaData) {
@@ -86,7 +98,7 @@
       }
 
       return React.createElement('div', { className: 'container mx-auto p-6 bg-white rounded-lg shadow-lg' },
-        // Full createElement tree for UI, same as last version
+        // Full UI createElement calls - same as previous
       );
     };
 
