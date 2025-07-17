@@ -1,165 +1,198 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.6">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
-    span.s1 {font-kerning: none}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medication Tree - Viking Hormone Clinic</title>
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #000000; color: #ffffff; }
+        .accent-orange { background-color: #f6ab18; }
+        .accent-orange:hover { background-color: #ea7219; }
+        .card-bg { background-color: #0c182a; }
+        .text-gray { color: #43131f; }
+        .modal-bg { background-color: #0c182a; }
+    </style>
 </head>
-<body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;html lang="en"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;head&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"/&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;title&gt;Viking Medication Tree&lt;/title&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;style&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>/* — Brand Colors — */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>:root {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>--v-yellow: #f6ab18;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>--v-black:<span class="Apple-converted-space">  </span>#000000;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>--v-white:<span class="Apple-converted-space">  </span>#ffffff;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>--v-blue: <span class="Apple-converted-space">  </span>#255db7;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>--v-orange: #ea7219;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>/* — Global Reset — */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>* { margin:0; padding:0; box-sizing:border-box; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>body {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-family: sans-serif;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: var(--v-black);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>color: var(--v-white);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>line-height: 1.4;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>header {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: var(--v-yellow);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>padding: 12px 24px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>header img {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>height: 48px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-right: 16px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>header h1 {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-size: 1.5rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>color: var(--v-black);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>/* — Tree Container — */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>#tree {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>padding: 24px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ul.tree, ul.tree ul {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>list-style: none;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-left: 1rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ul.tree li {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin: 4px 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>position: relative;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ul.tree li:before {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>content: '';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>position: absolute;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>top: 12px; left: -12px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>width: 8px; height: 1px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: var(--v-white);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ul.tree li .label {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>cursor: pointer;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>padding: 4px 8px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>border-radius: 4px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>transition: background .2s;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>display: inline-block;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ul.tree li .label:hover {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: rgba(255,255,255,0.1);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ul.tree li .children {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>display: none;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-top: 4px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ul.tree li .children.open {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>display: block;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;body&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;header&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;img src="logo.png" alt="Viking Logo"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;h1&gt;Viking Medication Tree&lt;/h1&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/header&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div id="tree"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;p&gt;Loading…&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>fetch('medications.json')</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>.then(res =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>if (!res.ok) throw new Error('Network response was not ok');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>return res.json();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>})</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>.then(data =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const tree = document.getElementById('tree');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>tree.innerHTML = '';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const ul = document.createElement('ul');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>ul.className = 'tree';</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>data.forEach(r =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>const li = document.createElement('li');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>// Medication name</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>const lbl = document.createElement('span');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>lbl.textContent = r.Medication || 'Unnamed';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>lbl.className = 'label';</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>// Detail list</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>const detailUl = document.createElement('ul');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>detailUl.className = 'children';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>['Type','Strength','Quantity','Price','Standard Dosing','State']</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>.forEach(k =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>if (r[k]) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const dLi = document.createElement('li');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>dLi.textContent = `${k}: ${r[k]}`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>detailUl.appendChild(dLi);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>// Pharmacy availability</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>const pharmUl = document.createElement('ul');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>pharmUl.className = 'children';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>['Hallandale','1st Choice','Rite Away','REVIVE','NuBioage','ScriptWorks']</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>.forEach(ph =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>if (r[ph] &amp;&amp; r[ph].toString().toLowerCase() === 'true') {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const pLi = document.createElement('li');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>pLi.textContent = `Available from ${ph}`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>pharmUl.appendChild(pLi);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>// Toggle details &amp; pharmacy on click</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>lbl.addEventListener('click', () =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>detailUl.classList.toggle('open');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>pharmUl.classList.toggle('open');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>li.appendChild(lbl);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>li.appendChild(detailUl);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>li.appendChild(pharmUl);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>ul.appendChild(li);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>tree.appendChild(ul);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>})</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>.catch(err =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>console.error(err);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>document.getElementById('tree').textContent = 'Error loading data.';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+<body class="bg-black font-sans">
+    <div id="root"></div>
+    <script>
+        const { useState } = React;
+        const e = React.createElement;
+
+        const medications = [
+            {
+                id: 1,
+                name: "Testosterone Cypionate",
+                goals: ["Retain Muscle", "Improve Libido", "HRT (Men)"],
+                dosing: "200 mg IM every 2 weeks or weekly; cream: 1-2 clicks (10-20 mg) daily",
+                delivery: ["Injectable", "Cream"],
+                price: { "CA": "$190-$365", "Other": "$170-$300" },
+                summary: "Treats hypogonadism and low T levels, boosting muscle, strength, and libido in men; low doses for women in HRT.",
+                pairings: ["Anastrozole (0.25-0.5 mg 2x weekly)", "Primobolan for enhanced muscle growth"]
+            },
+            {
+                id: 2,
+                name: "Estrogen Patch",
+                goals: ["Manage Menopause Symptoms", "Improve Bone Health"],
+                dosing: "0.0375-0.1 mg/24hr patch, 2 per week; ultra-low 0.014 mg/day weekly for bone focus",
+                delivery: ["Patch"],
+                price: { "CA": "$100/4 weeks", "Other": "$100/4 weeks" },
+                summary: "Eases hot flashes, vaginal dryness; boosts BMD to cut osteoporosis risk in postmenopausal women.",
+                pairings: ["Progestogen (if uterus present)", "Exercise for max bone protection"]
+            },
+            {
+                id: 3,
+                name: "Semaglutide",
+                goals: ["Weight Loss"],
+                dosing: "Start 0.25 mg weekly, up to 2.4 mg; with diet/exercise",
+                delivery: ["Injectable"],
+                price: { "CA": "$1199.99 or $599.99/month", "Other": "$1199.99 or $599.99/month" },
+                summary: "GLP-1 agonist for obesity and T2 diabetes; slashes appetite, aids major weight loss.",
+                pairings: ["Diet and exercise", "B12 for energy"]
+            },
+            {
+                id: 4,
+                name: "Tirzepatide",
+                goals: ["Weight Loss"],
+                dosing: "Start 2.5 mg weekly, up to 15 mg; subQ injection",
+                delivery: ["Injectable"],
+                price: { "CA": "$1399.99 or $699.99/month", "Other": "$1399.99 or $699.99/month" },
+                summary: "Dual GIP/GLP-1 agonist; drives big weight drops (up to 52 lbs at 15 mg) in obesity.",
+                pairings: ["Lifestyle changes", "Metformin if diabetic"]
+            },
+            {
+                id: 5,
+                name: "HCG",
+                goals: ["Improve Libido", "Fertility"],
+                dosing: "1000-4000 IU 3x/week; pair with TRT for fertility maintenance",
+                delivery: ["Injectable"],
+                price: { "CA": "Varies by pharmacy", "Other": "Varies by pharmacy" },
+                summary: "Boosts T production, sperm count, libido; key in TRT to preserve fertility and testicular size.",
+                pairings: ["Clomiphene (25 mg/day)", "TRT protocols"]
+            },
+            {
+                id: 6,
+                name: "Sermorelin",
+                goals: ["Retain Muscle", "HRT (Men)"],
+                dosing: "0.1-0.5 mg daily subQ, before bed; 5 days/week cycle",
+                delivery: ["Injectable"],
+                price: { "CA": "Varies by pharmacy", "Other": "Varies by pharmacy" },
+                summary: "GH secretagogue for muscle growth, recovery, anti-aging; FDA-ok'd alternative to peptides.",
+                pairings: ["GHRP-2 for synergy", "Strength training"]
+            }
+        ];
+
+        function MedicationCard({ medication, onClick, state }) {
+            const selectedPrice = medication.price[state] || medication.price["Other"];
+            return e('div', { className: "bg-white p-6 rounded-lg shadow-md hover:shadow-lg cursor-pointer transition", onClick: () => onClick(medication) },
+                e('h3', { className: "text-xl font-bold text-gray-800" }, medication.name),
+                e('p', { className: "text-gray-600 mt-2" }, e('strong', null, 'Goals: '), medication.goals.join(", ")),
+                e('p', { className: "text-gray-600" }, e('strong', null, 'Dosing: '), medication.dosing),
+                e('p', { className: "text-gray-600" }, e('strong', null, 'Delivery: '), medication.delivery.join(", ")),
+                e('p', { className: "text-gray-600" }, e('strong', null, `Price (${state}): `), selectedPrice)
+            );
+        }
+
+        function MedicationModal({ medication, onClose, state }) {
+            if (!medication) return null;
+            const selectedPrice = medication.price[state] || medication.price["Other"];
+            return e('div', { className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" },
+                e('div', { className: "bg-white p-8 rounded-lg max-w-lg w-full" },
+                    e('h2', { className: "text-2xl font-bold text-gray-800 mb-4" }, medication.name),
+                    e('p', null, e('strong', null, 'Goals: '), medication.goals.join(", ")),
+                    e('p', null, e('strong', null, 'Dosing: '), medication.dosing),
+                    e('p', null, e('strong', null, 'Delivery: '), medication.delivery.join(", ")),
+                    e('p', null, e('strong', null, `Price (${state}): `), selectedPrice),
+                    e('p', null, e('strong', null, 'Summary: '), medication.summary),
+                    e('p', null, e('strong', null, 'Recommended Pairings: '), medication.pairings.join(", ")),
+                    e('button', { className: "mt-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600", onClick: onClose }, 'Close')
+                )
+            );
+        }
+
+        function App() {
+            const [selectedGoal, setSelectedGoal] = useState("All");
+            const [selectedState, setSelectedState] = useState("Other");
+            const [searchTerm, setSearchTerm] = useState("");
+            const [selectedMedication, setSelectedMedication] = useState(null);
+
+            const goals = ["All", ...new Set(medications.flatMap(med => med.goals))];
+            const states = ["CA", "Other"];
+
+            const filteredMedications = medications
+                .filter(med => selectedGoal === "All" || med.goals.includes(selectedGoal))
+                .filter(med => med.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+            return e('div', { className: "max-w-7xl mx-auto p-6" },
+                e('h1', { className: "text-3xl font-bold text-gray-900 mb-6" }, 'Medication Tree - Viking Hormone Clinic'),
+                e('div', { className: "flex flex-wrap gap-4 mb-6" },
+                    e('div', null,
+                        e('label', { className: "text-lg font-semibold text-gray-700" }, 'Patient Goal:'),
+                        e('select', { className: "ml-2 p-2 border rounded-lg", value: selectedGoal, onChange: (e) => setSelectedGoal(e.target.value) },
+                            goals.map(goal => e('option', { key: goal, value: goal }, goal))
+                        )
+                    ),
+                    e('div', null,
+                        e('label', { className: "text-lg font-semibold text-gray-700" }, 'State:'),
+                        e('select', { className: "ml-2 p-2 border rounded-lg", value: selectedState, onChange: (e) => setSelectedState(e.target.value) },
+                            states.map(s => e('option', { key: s, value: s }, s))
+                        )
+                    ),
+                    e('div', null,
+                        e('label', { className: "text-lg font-semibold text-gray-700" }, 'Search:'),
+                        e('input', { type: "text", className: "ml-2 p-2 border rounded-lg", value: searchTerm, onChange: (e) => setSearchTerm(e.target.value), placeholder: "e.g., Testosterone" })
+                    )
+                ),
+                e('div', { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" },
+                    filteredMedications.map(med => e(MedicationCard, { key: med.id, medication: med, onClick: setSelectedMedication, state: selectedState }))
+                ),
+                e(MedicationModal, { medication: selectedMedication, onClose: () => setSelectedMedication(null), state: selectedState })
+            );
+        }
+
+        ReactDOM.render(e(App, null), document.getElementById('root'));
+    </script>
 </body>
 </html>
