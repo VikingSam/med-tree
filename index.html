@@ -4,20 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Medication Lookup App</title>
-  <meta http-equiv="Content-Security-Policy" content="script-src &#x27;self&#x27; &#x27;unsafe-eval&#x27; https://cdnjs.cloudflare.com https://unpkg.com https://cdn.tailwindcss.com;">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/papaparse@latest/papaparse.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.15.0/Recharts.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      content: ['./*.{html,js}'],
-      theme: { extend: {} },
-      plugins: [],
-    }
-  </script>
 </head>
 <body>
   <div id="root" class="min-h-screen bg-gray-100 p-4"></div>
@@ -27,10 +17,14 @@
     const root = createRoot(document.getElementById('root'));
 
     const App = () => {
-      const [caData, setCaData] = React.useState(null);
-      const [nonCaData, setNonCaData] = React.useState(null);
+      const [medications, setMedications] = React.useState([]);
+      const [caMedications, setCaMedications] = React.useState([]);
+      const [shipmentMap, setShipmentMap] = React.useState({});
       const [selectedState, setSelectedState] = React.useState('');
       const [selectedGoal, setSelectedGoal] = React.useState('');
+      const [loading, setLoading] = React.useState(false);
+      const [dataLoaded, setDataLoaded] = React.useState(false);
+      const [filteredMedications, setFilteredMedications] = React.useState([]);
 
       const patientGoals = [
         'Men - Standard TRT Protocol',
@@ -57,102 +51,474 @@
         'Washington', 'West Virginia', 'Wisconsin', 'Wyoming', 'Virgin Islands'
       ];
 
-      const shipmentMap = {
-        'Alabama': { Hallandale: false, 'First Choice': true, RiteAway: false, Revive: false, NuBiage: false, ScriptWorks: false },
-        'Alaska': { Hallandale: false, 'First Choice': true, RiteAway: false, Revive: false, NuBiage: false, ScriptWorks: false },
-        'Arizona': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Arkansas': { Hallandale: false, 'First Choice': true, RiteAway: false, Revive: false, NuBiage: false, ScriptWorks: false },
-        'California': { Hallandale: false, 'First Choice': false, RiteAway: false, Revive: false, NuBiage: false, ScriptWorks: true },
-        'Colorado': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: false, NuBiage: true, ScriptWorks: false },
-        'Connecticut': { Hallandale: false, 'First Choice': false, RiteAway: true, Revive: false, NuBiage: true, ScriptWorks: false },
-        'Delaware': { Hallandale: false, 'First Choice': false, RiteAway: true, Revive: false, NuBiage: true, ScriptWorks: false },
-        'District of Columbia': { Hallandale: true, 'First Choice': false, RiteAway: true, Revive: false, NuBiage: true, ScriptWorks: false },
-        'Florida': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: false, NuBiage: true, ScriptWorks: false },
-        'Georgia': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Hawaii': { Hallandale: false, 'First Choice': true, RiteAway: false, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Idaho': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: false, ScriptWorks: false },
-        'Illinois': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Indiana': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: false, NuBiage: false, ScriptWorks: false },
-        'Iowa': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: false, NuBiage: false, ScriptWorks: false },
-        'Kansas': { Hallandale: true, 'First Choice': false, RiteAway: false, Revive: false, NuBiage: true, ScriptWorks: false },
-        'Kentucky': { Hallandale: true, 'First Choice': false, RiteAway: false, Revive: false, NuBiage: true, ScriptWorks: false },
-        'Louisiana': { Hallandale: true, 'First Choice': false, RiteAway: false, Revive: false, NuBiage: true, ScriptWorks: false },
-        'Maine': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: false, ScriptWorks: false },
-        'Maryland': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Massachusetts': { Hallandale: false, 'First Choice': true, RiteAway: false, Revive: false, NuBiage: true, ScriptWorks: false },
-        'Michigan': { Hallandale: false, 'First Choice': true, RiteAway: false, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Minnesota': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: false, NuBiage: false, ScriptWorks: false },
-        'Mississippi': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: false, NuBiage: false, ScriptWorks: false },
-        'Missouri': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Montana': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Nebraska': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Nevada': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: true, NuBiage: true, ScriptWorks: false },
-        'New Hampshire': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: true, NuBiage: true, ScriptWorks: false },
-        'New Jersey': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: true, NuBiage: true, ScriptWorks: false },
-        'New Mexico': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'New York': { Hallandale: true, 'First Choice': false, RiteAway: false, Revive: true, NuBiage: true, ScriptWorks: false },
-        'North Carolina': { Hallandale: true, 'First Choice': false, RiteAway: false, Revive: true, NuBiage: true, ScriptWorks: false },
-        'North Dakota': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Ohio': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Oklahoma': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Oregon': { Hallandale: false, 'First Choice': true, RiteAway: false, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Pennsylvania': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Puerto Rico': { Hallandale: true, 'First Choice': false, RiteAway: false, Revive: false, NuBiage: true, ScriptWorks: false },
-        'Rhode Island': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: false, NuBiage: false, ScriptWorks: false },
-        'South Carolina': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: false, NuBiage: false, ScriptWorks: false },
-        'South Dakota': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Tennessee': { Hallandale: false, 'First Choice': false, RiteAway: false, Revive: false, NuBiage: false, ScriptWorks: false },
-        'Texas': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Utah': { Hallandale: true, 'First Choice': false, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Vermont': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: false, NuBiage: true, ScriptWorks: false },
-        'Virginia': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Washington': { Hallandale: true, 'First Choice': false, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'West Virginia': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Wisconsin': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBiage: true, ScriptWorks: false },
-        'Wyoming': { Hallandale: true, 'First Choice': false, RiteAway: true, Revive: false, NuBiage: false, ScriptWorks: false },
-        'Virgin Islands': { Hallandale: false, 'First Choice': false, RiteAway: false, Revive: false, NuBiage: false, ScriptWorks: false }
+      // Embedded shipment map (hardcoded from your data)
+      const defaultShipmentMap = {
+        'Alabama': { Hallandale: false, 'First Choice': true, RiteAway: false, Revive: false, NuBioage: false, ScriptWorks: false },
+        'Alaska': { Hallandale: false, 'First Choice': true, RiteAway: false, Revive: true, NuBioage: false, ScriptWorks: false },
+        'Arizona': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Arkansas': { Hallandale: false, 'First Choice': true, RiteAway: false, Revive: false, NuBioage: false, ScriptWorks: false },
+        'California': { Hallandale: false, 'First Choice': false, RiteAway: false, Revive: false, NuBioage: false, ScriptWorks: true },
+        'Colorado': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: false, NuBioage: true, ScriptWorks: false },
+        'Connecticut': { Hallandale: false, 'First Choice': true, RiteAway: true, Revive: false, NuBioage: true, ScriptWorks: false },
+        'Delaware': { Hallandale: true, 'First Choice': false, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'District of Columbia': { Hallandale: true, 'First Choice': false, RiteAway: true, Revive: false, NuBioage: true, ScriptWorks: false },
+        'Florida': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Georgia': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Hawaii': { Hallandale: false, 'First Choice': true, RiteAway: false, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Idaho': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Illinois': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Indiana': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Iowa': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: false, NuBioage: false, ScriptWorks: false },
+        'Kansas': { Hallandale: false, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Kentucky': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: false, NuBioage: true, ScriptWorks: false },
+        'Louisiana': { Hallandale: true, 'First Choice': false, RiteAway: false, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Maine': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: false, ScriptWorks: false },
+        'Maryland': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Massachusetts': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: false, NuBioage: true, ScriptWorks: false },
+        'Michigan': { Hallandale: false, 'First Choice': true, RiteAway: false, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Minnesota': { Hallandale: false, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Mississippi': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: false, NuBioage: false, ScriptWorks: false },
+        'Missouri': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Montana': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Nebraska': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Nevada': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: true, NuBioage: true, ScriptWorks: false },
+        'New Hampshire': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: true, NuBioage: true, ScriptWorks: false },
+        'New Jersey': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: true, NuBioage: true, ScriptWorks: false },
+        'New Mexico': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'New York': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'North Carolina': { Hallandale: true, 'First Choice': false, RiteAway: false, Revive: true, NuBioage: true, ScriptWorks: false },
+        'North Dakota': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Ohio': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Oklahoma': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Oregon': { Hallandale: false, 'First Choice': true, RiteAway: false, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Pennsylvania': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Puerto Rico': { Hallandale: true, 'First Choice': false, RiteAway: false, Revive: false, NuBioage: true, ScriptWorks: false },
+        'Rhode Island': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'South Carolina': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: false, NuBioage: false, ScriptWorks: false },
+        'South Dakota': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Tennessee': { Hallandale: false, 'First Choice': false, RiteAway: false, Revive: false, NuBioage: false, ScriptWorks: false },
+        'Texas': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Utah': { Hallandale: true, 'First Choice': false, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Vermont': { Hallandale: true, 'First Choice': true, RiteAway: false, Revive: false, NuBioage: true, ScriptWorks: false },
+        'Virginia': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Washington': { Hallandale: true, 'First Choice': false, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'West Virginia': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Wisconsin': { Hallandale: true, 'First Choice': true, RiteAway: true, Revive: true, NuBioage: true, ScriptWorks: false },
+        'Wyoming': { Hallandale: true, 'First Choice': false, RiteAway: true, Revive: false, NuBioage: false, ScriptWorks: false },
+        'Virgin Islands': { Hallandale: false, 'First Choice': false, RiteAway: false, Revive: false, NuBioage: false, ScriptWorks: false }
       };
 
-      const processAndCleanData = (rawData) => {
-        return rawData.map(row => {
-          const cleanedRow = {};
-          Object.keys(row).forEach(key => {
-            const value = row[key] != null ? String(row[key]).trim().replace(/^"|"$/g, '') : '';
-            cleanedRow[key] = value;
-          });
-          cleanedRow['Description'] = getMedicationDescription(cleanedRow['Medication']);
-          return cleanedRow;
-        }).filter(row => row['Medication']);
-      };
+      // Initialize with default shipment map
+      React.useEffect(() => {
+        setShipmentMap(defaultShipmentMap);
+      }, []);
 
+      // Updated medication descriptions
       const getMedicationDescription = (medication) => {
         const descriptions = {
           'Testosterone Cypionate': 'Used for TRT to treat low testosterone. Improves energy, muscle, libido. Side effects: acne, hair loss, mood changes.',
+          'Testosterone Enanthate': 'Long-acting testosterone for HRT. Similar to cypionate. Side effects: acne, hair loss, mood changes.',
           'Anastrozole': 'Reduces estrogen in TRT patients. Prevents gynecomastia. Side effects: joint pain, hot flashes.',
           'Bi-Estrogen Cream': 'HRT for menopause symptoms like hot flashes. Side effects: weight gain, blurred vision, tiredness, acne.',
           'Progesterone': 'Supports hormonal balance in HRT. Improves sleep, mood. Side effects: abdominal pain, bloating, blurred vision, nausea.',
-          'Clomiphene (Clomid)': 'Stimulates testosterone in men or ovulation in women. Side effects: hot flashes, headaches.',
+          'Clomiphene': 'Stimulates testosterone in men or ovulation in women. Side effects: hot flashes, headaches.',
+          'Clomid': 'Same as Clomiphene. Stimulates hormone production. Side effects: hot flashes, headaches.',
           'Estrogen Patch': 'HRT for menopause. Reduces hot flashes, vaginal dryness. Side effects: bloating, breast tenderness, headaches, nausea.',
           'DHEA': 'Supports hormone production. May improve energy, mood. Side effects: oily skin, acne, hair loss, upset stomach.',
           'Pregnenolone': 'Precursor hormone for others. May aid memory, mood. Side effects: overstimulation, insomnia, irritability, acne, headache.',
           'Nandrolone Decanoate': 'For joint pain, muscle wasting. Relieves hypogonadal joint pain. Side effects: headaches, acne, diarrhea, edema.',
           'L Carnitine': 'Aids fat burning, energy. For healing, performance. Side effects: stomach upset, heartburn, diarrhea, seizures.',
           'Sermorelin': 'Stimulates growth hormone release. Anti-aging, energy. Side effects: injection site reactions, headache, flushing, nausea.',
-          'CJC 1295/Ipamorelin': 'Boosts GH for muscle, fat loss. Side effects: headaches, flu-like symptoms, irritability, nausea.',
-          'BPC Capsules': 'Promotes healing, wound repair. For tendons, ligaments. Side effects: unknown in humans, potential injection reactions.',
-          'TB500 (Thymosin Beta 4)': 'Aids tissue repair, flexibility. Side effects: fatigue, headaches, dizziness, injection site irritation.',
-          'Sildenafil (Viagra)': 'Treats ED by increasing blood flow. Side effects: headache, flushing, nausea, stuffy nose.',
-          'Tadalafil (Cialis)': 'Treats ED, longer-lasting. Side effects: headache, flushing, back pain, nausea.',
-          'PT 141 (Bremelanotide)': 'Boosts libido, arousal. Side effects: nausea (common), vomiting, flushing, headache.',
+          'CJC 1295': 'Boosts GH for muscle, fat loss. Side effects: headaches, flu-like symptoms, irritability, nausea.',
+          'Ipamorelin': 'Growth hormone peptide. Works with CJC 1295. Side effects: headaches, flu-like symptoms.',
+          'BPC': 'Promotes healing, wound repair. For tendons, ligaments. Side effects: unknown in humans, potential injection reactions.',
+          'TB500': 'Aids tissue repair, flexibility. Side effects: fatigue, headaches, dizziness, injection site irritation.',
+          'TB4': 'Same as TB500. Thymosin Beta 4 for healing.',
+          'Sildenafil': 'Treats ED by increasing blood flow. Side effects: headache, flushing, nausea, stuffy nose.',
+          'Viagra': 'Brand name for Sildenafil. Treats ED. Side effects: headache, flushing, nausea.',
+          'Tadalafil': 'Treats ED, longer-lasting. Side effects: headache, flushing, back pain, nausea.',
+          'Cialis': 'Brand name for Tadalafil. Long-lasting ED treatment.',
+          'PT 141': 'Boosts libido, arousal. Side effects: nausea (common), vomiting, flushing, headache.',
+          'Bremelanotide': 'Same as PT 141. Enhances sexual desire.',
           'Oxytocin': 'Enhances bonding, may aid sexual function. Side effects: headache, nausea, vomiting, rapid heartbeat.',
           'Scream Cream': 'Topical for female arousal. Side effects: itching, redness, dryness, dizziness, headaches.',
-          'Aminos-1MG': 'Amino acid blend for recovery. Side effects: nausea, abdominal pain, vomiting, diarrhea.',
-          'DAC Amino L-Glutamine L-Arginine L-Carnitine': 'Supports recovery, energy. Side effects: stomach upset, diarrhea, bloating.',
           'Glutathione': 'Antioxidant for detox, skin. Side effects: rash (topical), nausea, abdominal cramps (injections).',
           'Lipo B': 'Fat-burning injection with B vitamins. Side effects: allergic reactions, anxiety, constipation, diarrhea.',
-          'MIC B12/BioBoost': 'Weight loss blend with B12. Side effects: pain at site, nausea, vomiting, diarrhea.',
-          'Vitamin B12 D': 'For energy, deficiency. Side effects: mild diarrhea, itching, swelling sensation.',
+          'MIC B12': 'Weight loss blend with B12. Side effects: pain at site, nausea, vomiting, diarrhea.',
+          'BioBoost': 'Energy and metabolism support. Contains B vitamins.',
+          'Vitamin B12': 'For energy, deficiency. Side effects: mild diarrhea, itching, swelling sensation.',
           'Lipo C': 'Lipotropic for fat loss. Side effects: pain/swelling at site, nausea, gastrointestinal issues.',
-          'Finasteride / Minoxidil': 'For hair loss. Finasteride blocks DHT; Minoxidil promotes growth. Side effects: itching, scalp irritation, sexual dysfunction (finasteride).',
-          'Metformin': 'Blood sugar control for weight loss. Side effects: nausea, diarrhea.',
-          'Phentermine': 'Appetite suppressant. Side effects: dry mouth, insomnia
+          'Finasteride': 'For hair loss. Blocks DHT. Side effects: sexual dysfunction, depression.',
+          'Minoxidil': 'For hair loss. Promotes growth. Side effects: itching, scalp irritation.',
+          'Metformin': 'Blood sugar control for weight loss. Side effects: nausea, diarrhea, stomach upset.',
+          'Phentermine': 'Appetite suppressant. Side effects: dry mouth, insomnia, increased heart rate.',
+          'Semaglutide': 'GLP-1 for weight loss. Side effects: nausea, vomiting, diarrhea.',
+          'Tirzepatide': 'Dual GIP/GLP-1 for weight loss. Side effects: nausea, decreased appetite.',
+          'Melatonin': 'Sleep hormone supplement. Side effects: drowsiness, headache, dizziness.',
+          'Trazodone': 'Sleep aid, antidepressant. Side effects: drowsiness, dry mouth, dizziness.',
+          'HCG': 'Human chorionic gonadotropin. Stimulates testosterone. Side effects: headache, irritability, fatigue.',
+          'Gonadorelin': 'Stimulates LH/FSH release. Alternative to HCG. Side effects: injection site reactions.',
+          'Enclomiphene': 'Selective estrogen receptor modulator. Boosts testosterone. Side effects: hot flashes, headaches.',
+          'Tamoxifen': 'SERM for estrogen blocking. Side effects: hot flashes, nausea.',
+          'Exemestane': 'Aromatase inhibitor. Reduces estrogen. Side effects: joint pain, fatigue.',
+          'Letrozole': 'Aromatase inhibitor. Very potent. Side effects: joint pain, hot flashes.',
+          'Cabergoline': 'Dopamine agonist. Reduces prolactin. Side effects: nausea, dizziness.',
+          'Aminos': 'Amino acid blend for recovery. Side effects: nausea, abdominal pain.',
+          'DAC Amino': 'Amino acid complex with L-Glutamine, L-Arginine, L-Carnitine.',
+          'Kyzatrex': 'Oral testosterone undecanoate. Alternative to injections. Side effects: similar to other testosterone.',
+          'Pregnyl': 'Brand name for HCG. Used in fertility and testosterone support.'
+        };
+
+        // Try to find a matching description
+        for (const [key, desc] of Object.entries(descriptions)) {
+          if (medication && medication.toLowerCase().includes(key.toLowerCase())) {
+            return desc;
+          }
+        }
+
+        // Check if medication name contains any key words
+        const medLower = medication ? medication.toLowerCase() : '';
+        if (medLower.includes('testosterone')) {
+          return 'Testosterone replacement therapy. Side effects: acne, hair loss, mood changes.';
+        }
+        if (medLower.includes('estrogen') || medLower.includes('bi-est')) {
+          return 'Estrogen hormone replacement. Side effects: bloating, breast tenderness.';
+        }
+        if (medLower.includes('vitamin') || medLower.includes('b12')) {
+          return 'Vitamin supplementation for energy and health.';
+        }
+        
+        return 'Medication information not available. Please consult your healthcare provider.';
+      };
+
+      // Parse medications from CSV data
+      const parseMedications = (csvData, isCA = false) => {
+        const lines = csvData.split('\n').map(line => line.trim()).filter(line => line);
+        const medications = [];
+        let currentCategory = null;
+        let headerIndices = null;
+        
+        for (let i = 0; i < lines.length; i++) {
+          const parsed = Papa.parse(lines[i], { 
+            dynamicTyping: true,
+            skipEmptyLines: true 
+          });
+          
+          if (parsed.data.length === 0) continue;
+          
+          const row = parsed.data[0];
+          
+          // Skip empty rows
+          if (!row || row.every(cell => !cell)) continue;
+          
+          // Check if this is a category header (contains goal keywords)
+          const firstCell = String(row[0] || '');
+          if (patientGoals.some(goal => firstCell.includes(goal))) {
+            currentCategory = patientGoals.find(goal => firstCell.includes(goal));
+            continue;
+          }
+          
+          // Check if this is the header row
+          if (firstCell === 'Medication' || firstCell.toLowerCase().includes('medication')) {
+            headerIndices = {
+              medication: 0,
+              syringes: row.findIndex(h => h && String(h).toLowerCase().includes('syringe')),
+              delivery: row.findIndex(h => h && (String(h).toLowerCase().includes('delivery') || String(h).toLowerCase() === 'type')),
+              strength: row.findIndex(h => h && String(h).toLowerCase().includes('strength')),
+              quantity: row.findIndex(h => h && String(h).toLowerCase().includes('quantity')),
+              price: row.findIndex(h => h && String(h).toLowerCase().includes('price')),
+              duration: row.findIndex(h => h && String(h).toLowerCase().includes('duration')),
+              pharmacy: row.findIndex(h => h && String(h).toLowerCase().includes('pharmacy')),
+              remarksDosing: row.findIndex(h => h && (String(h).toLowerCase().includes('remark') || String(h).toLowerCase().includes('dosing'))),
+              description: row.findIndex(h => h && String(h).toLowerCase().includes('description'))
+            };
+            continue;
+          }
+          
+          // Skip if we don't have a category or header indices yet
+          if (!currentCategory || !headerIndices) continue;
+          
+          // Skip rows that look like sub-headers or notes
+          if (firstCell.toLowerCase().includes('note') || 
+              firstCell.toLowerCase().includes('standard add on') ||
+              firstCell === '$100 CONSULT FEE' ||
+              row.filter(cell => cell).length < 2) {
+            continue;
+          }
+          
+          // Parse medication row
+          if (firstCell && firstCell.trim()) {
+            const med = {
+              category: currentCategory,
+              medication: firstCell.trim(),
+              syringes: headerIndices.syringes >= 0 ? String(row[headerIndices.syringes] || '') : '',
+              delivery: headerIndices.delivery >= 0 ? String(row[headerIndices.delivery] || '') : '',
+              strength: headerIndices.strength >= 0 ? String(row[headerIndices.strength] || '') : '',
+              quantity: headerIndices.quantity >= 0 ? String(row[headerIndices.quantity] || '') : '',
+              price: headerIndices.price >= 0 ? String(row[headerIndices.price] || '') : '',
+              duration: headerIndices.duration >= 0 ? String(row[headerIndices.duration] || '') : '',
+              pharmacy: headerIndices.pharmacy >= 0 ? String(row[headerIndices.pharmacy] || '') : '',
+              remarksDosing: headerIndices.remarksDosing >= 0 ? String(row[headerIndices.remarksDosing] || '') : '',
+              description: headerIndices.description >= 0 ? String(row[headerIndices.description] || '') : getMedicationDescription(firstCell.trim()),
+              isCA: isCA
+            };
+            
+            // Add description if not present
+            if (!med.description || med.description === 'null') {
+              med.description = getMedicationDescription(med.medication);
+            }
+            
+            medications.push(med);
+          }
+        }
+        
+        return medications;
+      };
+
+      // Handle file upload
+      const handleFileUpload = (event, fileType) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        setLoading(true);
+        const reader = new FileReader();
+        
+        reader.onload = (e) => {
+          const content = e.target.result;
+          
+          if (fileType === 'viking') {
+            const meds = parseMedications(content, false);
+            setMedications(meds);
+          } else if (fileType === 'ca') {
+            const meds = parseMedications(content, true);
+            setCaMedications(meds);
+          }
+          
+          // Check if both files are loaded
+          if ((fileType === 'viking' && caMedications.length > 0) || 
+              (fileType === 'ca' && medications.length > 0)) {
+            setDataLoaded(true);
+          }
+          
+          setLoading(false);
+        };
+        
+        reader.readAsText(file);
+      };
+
+      // Filter medications based on selection
+      React.useEffect(() => {
+        if (!selectedState || !selectedGoal) {
+          setFilteredMedications([]);
+          return;
+        }
+        
+        // Get the appropriate medication list
+        const medList = selectedState === 'California' ? caMedications : medications;
+        
+        // Filter by goal
+        let filtered = medList.filter(med => med.category === selectedGoal);
+        
+        // Filter by pharmacy availability
+        if (selectedState !== 'California') {
+          const stateShipping = shipmentMap[selectedState] || {};
+          
+          filtered = filtered.filter(med => {
+            // If no specific pharmacy listed, assume all pharmacies carry it
+            if (!med.pharmacy || med.pharmacy === 'null' || med.pharmacy.trim() === '') {
+              // Check if any pharmacy ships to this state
+              return Object.values(stateShipping).some(ships => ships);
+            }
+            
+            // Check specific pharmacies
+            const pharmacies = med.pharmacy.split(',').map(p => p.trim());
+            
+            // Handle HCG special case
+            if (med.medication.toLowerCase().includes('hcg') || 
+                med.medication.toLowerCase().includes('pregnyl') ||
+                med.medication.toLowerCase().includes('gonadorelin')) {
+              return stateShipping['RiteAway'] || stateShipping['Revive'];
+            }
+            
+            // Check each listed pharmacy
+            return pharmacies.some(pharmacy => {
+              if (pharmacy.includes('Hallandale')) return stateShipping['Hallandale'];
+              if (pharmacy.includes('First Choice') || pharmacy.includes('1st Choice')) return stateShipping['First Choice'];
+              if (pharmacy.includes('Rite Away') || pharmacy.includes('RiteAway')) return stateShipping['RiteAway'];
+              if (pharmacy.includes('Revive')) return stateShipping['Revive'];
+              if (pharmacy.includes('NuBioage') || pharmacy.includes('NuBiage')) return stateShipping['NuBioage'];
+              
+              // If pharmacy not recognized, assume it's available
+              return true;
+            });
+          });
+        }
+        
+        setFilteredMedications(filtered);
+      }, [selectedState, selectedGoal, medications, caMedications, shipmentMap]);
+
+      if (!dataLoaded) {
+        return (
+          <div className="max-w-7xl mx-auto">
+            <div className="bg-white rounded-lg shadow-lg p-8">
+              <h1 className="text-3xl font-bold text-gray-800 mb-6">Medication Lookup App</h1>
+              
+              <div className="mb-6">
+                <p className="text-gray-600 mb-4">Please upload the medication CSV files to get started:</p>
+                
+                <div className="space-y-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                    <label className="block">
+                      <span className="text-lg font-medium text-gray-700">Non-California Medications (Viking file)</span>
+                      <input
+                        type="file"
+                        accept=".csv"
+                        onChange={(e) => handleFileUpload(e, 'viking')}
+                        className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      />
+                      <p className="mt-1 text-sm text-gray-500">Upload "Viking Medication Converted to Standard Columns UTF.csv"</p>
+                    </label>
+                  </div>
+                  
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                    <label className="block">
+                      <span className="text-lg font-medium text-gray-700">California Medications</span>
+                      <input
+                        type="file"
+                        accept=".csv"
+                        onChange={(e) => handleFileUpload(e, 'ca')}
+                        className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      />
+                      <p className="mt-1 text-sm text-gray-500">Upload "ca_meds.csv" or "California Pricing and Products.csv"</p>
+                    </label>
+                  </div>
+                </div>
+                
+                {loading && (
+                  <div className="mt-4 text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-2 text-gray-600">Processing file...</p>
+                  </div>
+                )}
+                
+                <div className="mt-6 p-4 bg-yellow-50 rounded-lg">
+                  <p className="text-sm text-gray-700">
+                    <strong>Note:</strong> The pharmacy shipping restrictions are already built into the app. 
+                    You only need to upload the medication files.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h1 className="text-3xl font-bold text-gray-800 mb-6">Medication Lookup</h1>
+            
+            <div className="grid md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select State
+                </label>
+                <select
+                  value={selectedState}
+                  onChange={(e) => setSelectedState(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Choose a state...</option>
+                  {states.map(state => (
+                    <option key={state} value={state}>{state}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Patient Goal
+                </label>
+                <select
+                  value={selectedGoal}
+                  onChange={(e) => setSelectedGoal(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={!selectedState}
+                >
+                  <option value="">Choose a goal...</option>
+                  {patientGoals.map(goal => (
+                    <option key={goal} value={goal}>{goal}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {selectedState && !selectedGoal && (
+              <p className="text-gray-600">Please select a patient goal to view available medications.</p>
+            )}
+          </div>
+
+          {filteredMedications.length > 0 && (
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                Available Medications for {selectedGoal} in {selectedState}
+              </h2>
+              
+              <div className="space-y-6">
+                {filteredMedications.map((med, index) => (
+                  <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <h3 className="text-lg font-semibold text-blue-600 mb-2">{med.medication}</h3>
+                    
+                    <div className="grid md:grid-cols-2 gap-4 mb-3">
+                      <div>
+                        {med.delivery && <p><span className="font-medium">Delivery:</span> {med.delivery}</p>}
+                        {med.strength && <p><span className="font-medium">Strength:</span> {med.strength}</p>}
+                        {med.quantity && <p><span className="font-medium">Quantity:</span> {med.quantity}</p>}
+                        {med.price && <p><span className="font-medium">Price:</span> {med.price}</p>}
+                      </div>
+                      <div>
+                        {med.duration && <p><span className="font-medium">Duration:</span> {med.duration}</p>}
+                        {med.syringes && med.syringes !== 'null' && (
+                          <p><span className="font-medium">Syringes:</span> {med.syringes}</p>
+                        )}
+                        {med.pharmacy && med.pharmacy !== 'null' && (
+                          <p><span className="font-medium">Pharmacy:</span> {med.pharmacy}</p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {med.remarksDosing && med.remarksDosing !== 'null' && (
+                      <div className="mb-3 p-3 bg-yellow-50 rounded">
+                        <p className="font-medium text-gray-700">Dosing Instructions:</p>
+                        <p className="text-gray-600">{med.remarksDosing}</p>
+                      </div>
+                    )}
+                    
+                    {med.description && (
+                      <div className="p-3 bg-gray-50 rounded">
+                        <p className="font-medium text-gray-700">Description:</p>
+                        <p className="text-gray-600">{med.description}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {selectedState && selectedGoal && filteredMedications.length === 0 && (
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <p className="text-center text-gray-600">
+                No medications available for {selectedGoal} in {selectedState}. 
+                This may be due to pharmacy shipping restrictions.
+              </p>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    root.render(<App />);
+  </script>
+</body>
+</html>
