@@ -1422,7 +1422,7 @@
       ];
 // COMPLETE VIKING MEDICATION DATA - ALL MEDICATIONS FROM PDF
         const VIKING_MEDICATIONS = [
-           // Men - Standard TRT Protocol
+          // Men - Standard TRT Protocol
             {category: 'Men - Standard TRT Protocol', medication: 'Testosterone Cypionate Anastrozole Tablets #10', syringes: '#20 IM syringes', delivery: 'Injectable', strength: '200mg/ml', quantity: '10ml vial', price: '$250.00', duration: '10 weeks', pharmacy: 'ALL', remarksDosing: 'Inject 0.5 ml (100 mg) by intramuscular route 2x weekly. Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.', description: 'Testosterone Cypionate is a long-acting form of testosterone, the primary male sex hormone. Used in hormone replacement therapy (HRT) to treat low testosterone levels in adult men to help improve mood, energy, libido, muscle mass, fat distribution, and overall quality of life.'},
             {category: 'Men - Standard TRT Protocol', medication: 'Testosterone Enanthate Anastrozole Tablets #10', syringes: '#20 IM syringes', delivery: 'Injectable', strength: '200mg/ml', quantity: '10ml vial', price: '$250.00', duration: '10 weeks', pharmacy: 'ALL', remarksDosing: 'Inject 0.5 ml (100 mg) by intramuscular route 2x weekly. Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.', description: 'Testosterone Enanthate is a long-acting form of testosterone used in hormone replacement therapy.'},
             
@@ -1533,18 +1533,36 @@
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            initializeApp();
+            console.log('DOM loaded, trying to initialize...');
+            try {
+                initializeApp();
+                console.log('App initialized successfully');
+            } catch (error) {
+                console.error('Error initializing app:', error);
+            }
         });
 
         function initializeApp() {
+            console.log('Starting initializeApp...');
+            console.log('VIKING_MEDICATIONS length:', VIKING_MEDICATIONS.length);
             populateStates();
             populateGoals();
             
             const stateSelect = document.getElementById('state-select');
             const goalSelect = document.getElementById('goal-select');
             
+            if (!stateSelect) {
+                console.error('Could not find state-select element');
+                return;
+            }
+            if (!goalSelect) {
+                console.error('Could not find goal-select element');
+                return;
+            }
+            
             stateSelect.addEventListener('change', handleStateChange);
             goalSelect.addEventListener('change', handleSearch);
+            console.log('Event listeners added');
         }
 
         function populateStates() {
