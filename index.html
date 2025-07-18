@@ -1757,8 +1757,9 @@
       }
     ];
 
-    // California medications - will add complete list based on CA data structure
+    // California medications - COMPLETE list from CA price sheet using non-CA categorization
     const CA_MEDICATIONS = [
+      // Men - Standard TRT Protocol
       {
         category: 'Men - Standard TRT Protocol',
         medication: 'Testosterone Cypionate Anastrozole Tablets #10',
@@ -1771,6 +1772,190 @@
         pharmacy: 'ScriptWorks',
         remarksDosing: 'Inject 0.5 ml (100 mg) by intramuscular route 2x weekly. Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.',
         description: 'California-specific testosterone formulation.'
+      },
+      {
+        category: 'Men - Standard TRT Protocol',
+        medication: 'Testosterone Enanthate Anastrozole Tablets #10',
+        syringes: '#20 IM syringes',
+        delivery: 'INJECTABLE',
+        strength: '200mg/ml',
+        quantity: '10ml vial',
+        price: '$275.00',
+        duration: '10 weeks',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: 'Inject 0.5 ml (100 mg) by intramuscular route 2x weekly. Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.',
+        description: 'California testosterone enanthate formulation.'
+      },
+      {
+        category: 'Men - Standard TRT Protocol',
+        medication: 'Testosterone Cream 200 MG/GM (20%) Anastrozole Tablets #10',
+        syringes: '',
+        delivery: 'CREAM',
+        strength: '200mg/g',
+        quantity: '30g',
+        price: '$315.00',
+        duration: '8 weeks',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: 'Up to 1 click 2x per day. Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.',
+        description: 'California topical testosterone 30g.'
+      },
+      {
+        category: 'Men - Standard TRT Protocol',
+        medication: 'Testosterone Cream 200 MG/GM (20%) Anastrozole Tablets #10',
+        syringes: '',
+        delivery: 'CREAM',
+        strength: '200mg/g',
+        quantity: '60g',
+        price: '$315.00',
+        duration: '8 weeks',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: 'Up to 2 clicks 2x per day. Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.',
+        description: 'California topical testosterone 60g.'
+      },
+      {
+        category: 'Men - Standard TRT Protocol',
+        medication: 'Testosterone Cream 200 MG/GM (20%) Anastrozole Tablets #10',
+        syringes: '',
+        delivery: 'CREAM',
+        strength: '200mg/g',
+        quantity: '90g',
+        price: '$340.00',
+        duration: '8 weeks',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: 'Up to 3 clicks 2x per day. Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.',
+        description: 'California topical testosterone 90g.'
+      },
+      {
+        category: 'Men - Standard TRT Protocol',
+        medication: 'Testosterone Cream 200 MG/GM (20%) Anastrozole Tablets #10',
+        syringes: '',
+        delivery: 'CREAM',
+        strength: '200mg/g',
+        quantity: '120g',
+        price: '$365.00',
+        duration: '8 weeks',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: 'Up to 4 clicks 2x per day. Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.',
+        description: 'California topical testosterone 120g.'
+      },
+
+      // Men - Standard Add On
+      {
+        category: 'Men - Standard Add On',
+        medication: 'Pregnyl',
+        syringes: '',
+        delivery: 'Injectable',
+        strength: '',
+        quantity: '',
+        price: '',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'HCG for California patients.'
+      },
+      {
+        category: 'Men - Standard Add On',
+        medication: 'Gonadorelin - lyophilized (Powder)',
+        syringes: '#20 Insulin syringes',
+        delivery: 'INJECTABLE',
+        strength: '2mg (2000mcg)',
+        quantity: '1 vial',
+        price: '$150.00',
+        duration: '10 weeks',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: 'Inject 50 units by subcutaneous route 2x weekly. Reconstitute with 10ml bac water',
+        description: 'California GnRH analog powder formulation.'
+      },
+      {
+        category: 'Men - Standard Add On',
+        medication: 'Anastrozole',
+        syringes: '',
+        delivery: 'Tablet',
+        strength: '1mg',
+        quantity: '1',
+        price: '$1.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California aromatase inhibitor.'
+      },
+      {
+        category: 'Men - Standard Add On',
+        medication: 'Clomiphene (Clomid)',
+        syringes: '',
+        delivery: 'Capsule',
+        strength: '25mg',
+        quantity: '1',
+        price: '$1.50',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: 'take 1 capsule po twice weekly, may work up to daily dosing',
+        description: 'California SERM 25mg.'
+      },
+      {
+        category: 'Men - Standard Add On',
+        medication: 'Clomiphene (Clomid)',
+        syringes: '',
+        delivery: 'Capsule',
+        strength: '50mg',
+        quantity: '1',
+        price: '$2.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: 'may increase to daily dosing gradually from 25mg',
+        description: 'California SERM 50mg.'
+      },
+      {
+        category: 'Men - Standard Add On',
+        medication: 'Enclomiphene',
+        syringes: '',
+        delivery: 'Capsule',
+        strength: '12.5mg',
+        quantity: '1',
+        price: '$5.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: 'take 1 capsule po twice weekly, may work up to daily dosing',
+        description: 'California selective estrogen receptor modulator.'
+      },
+      {
+        category: 'Men - Standard Add On',
+        medication: 'Tamoxifen',
+        syringes: '',
+        delivery: 'Tablet',
+        strength: '20mg',
+        quantity: '1',
+        price: '$2.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: 'take 1 tablet po twice weekly to daily - only x 2 weeks',
+        description: 'California SERM for short-term use.'
+      },
+      {
+        category: 'Men - Standard Add On',
+        medication: 'DHEA',
+        syringes: '',
+        delivery: 'Capsule',
+        strength: '25mg',
+        quantity: '1',
+        price: '$1.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: 'take 1 capsule',
+        description: 'California hormone precursor.'
+      },
+      {
+        category: 'Men - Standard Add On',
+        medication: 'Pregnenolone',
+        syringes: '',
+        delivery: 'Capsule',
+        strength: '',
+        quantity: '',
+        price: '',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California hormone precursor supplement.'
       },
       
       // Women - Standard HRT Protocol
@@ -1797,8 +1982,8 @@
         price: '$245.00',
         duration: '8 weeks',
         pharmacy: 'ScriptWorks',
-        remarksDosing: 'Up to 1 click 2x per day',
-        description: 'Topical testosterone for women 15g (California).'
+        remarksDosing: '1 Click daily',
+        description: 'California topical testosterone for women 15g.'
       },
       {
         category: 'Women - Standard HRT Protocol',
@@ -1810,11 +1995,154 @@
         price: '$245.00',
         duration: '8 weeks',
         pharmacy: 'ScriptWorks',
-        remarksDosing: 'Up to 2 clicks 2x per day',
-        description: 'Topical testosterone for women 30g (California).'
+        remarksDosing: '1 Click 2x daily',
+        description: 'California topical testosterone for women 30g.'
+      },
+      {
+        category: 'Women - Standard HRT Protocol',
+        medication: 'Testosterone Cypionate (10%)',
+        syringes: '',
+        delivery: 'CREAM',
+        strength: '10mg/g',
+        quantity: '60G',
+        price: '$270.00',
+        duration: '8 weeks',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '2 clicks 2x daily',
+        description: 'California topical testosterone for women 60g.'
       },
       
       // Women - Standard Add On
+      {
+        category: 'Women - Standard Add On',
+        medication: 'Bi-Estrogen Cream 0.25mg/g',
+        syringes: '',
+        delivery: 'TopiClick',
+        strength: '0.25mg/g',
+        quantity: '30g',
+        price: '$150.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California bioidentical estrogen replacement.'
+      },
+      {
+        category: 'Women - Standard Add On',
+        medication: 'Bi-Estrogen Cream 1mg/g',
+        syringes: '',
+        delivery: 'TopiClick',
+        strength: '1mg/g',
+        quantity: '30g',
+        price: '$150.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California higher strength estrogen replacement.'
+      },
+      {
+        category: 'Women - Standard Add On',
+        medication: 'Bi-Estrogen Cream 5mg/g',
+        syringes: '',
+        delivery: 'TopiClick',
+        strength: '5mg/g',
+        quantity: '30g',
+        price: '$175.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California highest strength estrogen replacement.'
+      },
+      {
+        category: 'Women - Standard Add On',
+        medication: 'Progesterone',
+        syringes: '',
+        delivery: 'Capsule',
+        strength: '50mg',
+        quantity: '1',
+        price: '$1.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California natural progesterone 50mg.'
+      },
+      {
+        category: 'Women - Standard Add On',
+        medication: 'Progesterone',
+        syringes: '',
+        delivery: 'Capsule',
+        strength: '100mg',
+        quantity: '1',
+        price: '$1.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California natural progesterone 100mg.'
+      },
+      {
+        category: 'Women - Standard Add On',
+        medication: 'Progesterone',
+        syringes: '',
+        delivery: 'Capsule',
+        strength: '200mg',
+        quantity: '1',
+        price: '$1.50',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California natural progesterone 200mg.'
+      },
+      {
+        category: 'Women - Standard Add On',
+        medication: 'Progesterone',
+        syringes: '',
+        delivery: 'Troche',
+        strength: '100mg',
+        quantity: '1',
+        price: '$3.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California progesterone troche 100mg.'
+      },
+      {
+        category: 'Women - Standard Add On',
+        medication: 'Progesterone',
+        syringes: '',
+        delivery: 'Troche',
+        strength: '200mg',
+        quantity: '1',
+        price: '$3.50',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California progesterone troche 200mg.'
+      },
+      {
+        category: 'Women - Standard Add On',
+        medication: 'DHEA',
+        syringes: '',
+        delivery: 'Capsule',
+        strength: '25mg',
+        quantity: '1',
+        price: '$1.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California DHEA supplement.'
+      },
+      {
+        category: 'Women - Standard Add On',
+        medication: 'Pregnenolone',
+        syringes: '',
+        delivery: 'Capsule',
+        strength: '',
+        quantity: '',
+        price: '',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California hormone precursor for women.'
+      },
       {
         category: 'Women - Standard Add On',
         medication: 'Estrogen Patch',
@@ -1879,6 +2207,198 @@
         pharmacy: 'ScriptWorks',
         remarksDosing: '2 patches per week',
         description: 'Highest dose estrogen patch (California).'
+      },
+
+      // Hair Loss
+      {
+        category: 'Hair Loss',
+        medication: 'Finasteride',
+        syringes: '',
+        delivery: 'Tablet',
+        strength: '1mg',
+        quantity: '1',
+        price: '$1.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California 5α-reductase inhibitor for hair loss.'
+      },
+
+      // Sexual Function
+      {
+        category: 'Sexual Function',
+        medication: 'Sildenafil (Viagra)',
+        syringes: '',
+        delivery: 'Tablet',
+        strength: '20mg',
+        quantity: '1',
+        price: '$1.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'Low dose ED medication (California).'
+      },
+      {
+        category: 'Sexual Function',
+        medication: 'Sildenafil (Viagra)',
+        syringes: '',
+        delivery: 'Tablet',
+        strength: '100mg',
+        quantity: '1',
+        price: '$2.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'Standard dose ED medication (California).'
+      },
+      {
+        category: 'Sexual Function',
+        medication: 'Tadalafil (Cialis)',
+        syringes: '',
+        delivery: 'Tablet',
+        strength: '5mg',
+        quantity: '1',
+        price: '$1.25',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'Daily dose ED medication (California).'
+      },
+      {
+        category: 'Sexual Function',
+        medication: 'Tadalafil (Cialis)',
+        syringes: '',
+        delivery: 'Tablet',
+        strength: '20mg',
+        quantity: '1',
+        price: '$2.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'As-needed ED medication (California).'
+      },
+
+      // Weight Loss
+      {
+        category: 'Weight Loss',
+        medication: 'Metformin',
+        syringes: '',
+        delivery: 'Tablet',
+        strength: '500mg',
+        quantity: '1',
+        price: '$0.50',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California diabetes medication for weight management.'
+      },
+      {
+        category: 'Weight Loss',
+        medication: 'Phentermine',
+        syringes: '',
+        delivery: 'Tablet',
+        strength: '37.5mg',
+        quantity: '1',
+        price: '$2.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California appetite suppressant.'
+      },
+      {
+        category: 'Weight Loss',
+        medication: 'Sermorelin',
+        syringes: '',
+        delivery: 'Injectable',
+        strength: '2mg/ml',
+        quantity: '10ml',
+        price: '$185.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California growth hormone releasing hormone for weight loss.'
+      },
+      {
+        category: 'Weight Loss',
+        medication: 'Semaglutide',
+        syringes: '',
+        delivery: 'Injectable',
+        strength: '1.25MG',
+        quantity: '4mL',
+        price: '$699.99',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: 'Need Health form and Semi labs',
+        description: 'California GLP-1 agonist for weight loss.'
+      },
+
+      // Vitamins
+      {
+        category: 'Vitamins',
+        medication: 'Glutathione',
+        syringes: '',
+        delivery: 'Nasal Spray',
+        strength: '200mg/ml',
+        quantity: '10ml',
+        price: '$50.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California antioxidant nasal spray 10ml.'
+      },
+      {
+        category: 'Vitamins',
+        medication: 'Glutathione',
+        syringes: '',
+        delivery: 'Nasal Spray',
+        strength: '200mg/ml',
+        quantity: '30ml',
+        price: '$100.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California antioxidant nasal spray 30ml.'
+      },
+      {
+        category: 'Vitamins',
+        medication: 'L Carnitine',
+        syringes: '',
+        delivery: 'Injectable',
+        strength: '200MG/ML',
+        quantity: '30ml',
+        price: '$100.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California amino acid for energy metabolism.'
+      },
+
+      // Anti-Aging
+      {
+        category: 'Anti-Aging',
+        medication: 'Metformin',
+        syringes: '',
+        delivery: 'Tablet',
+        strength: '500mg',
+        quantity: '1',
+        price: '$0.50',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California anti-aging and metabolic support.'
+      },
+      {
+        category: 'Anti-Aging',
+        medication: 'Sermorelin',
+        syringes: '',
+        delivery: 'Injectable',
+        strength: '2mg/ml',
+        quantity: '10ml',
+        price: '$185.00',
+        duration: '',
+        pharmacy: 'ScriptWorks',
+        remarksDosing: '',
+        description: 'California growth hormone releasing hormone for anti-aging.'
       }
     ];
 
