@@ -2281,16 +2281,13 @@ Viking Medicine Tree Index.html as of 1:34 pm on 07/18/25
                     <div>
                         <strong>Price:</strong> ${medication.price}
                     </div>
-                    ${medication.duration ? `<div><strong>Duration:</strong> ${medication.duration}</div>` : ''}
-                    <div>
-                        <strong>Pharmacy:</strong> ${medication.pharmacy}
-                    </div>
-                    ${medication.syringes ? `<div><strong>Syringes:</strong> ${medication.syringes}</div>` : ''}
+                    ${medication.duration ? '<div><strong>Duration:</strong> ' + medication.duration + '</div>' : ''}
+<div>
+<strong>Pharmacy:</strong> ${medication.pharmacy}
+</div>
+${medication.syringes ? '<div><strong>Syringes:</strong> ' + medication.syringes + '</div>' : ''}
                 </div>
-                ${medication.remarksDosing ? `
-                    <div class="info-box dosing">
-                        <strong>Dosing Instructions:</strong> ${medication.remarksDosing}
-                    </div>
+               ${medication.remarksDosing ? '<div class="info-box dosing"><strong>Dosing Instructions:</strong> ' + medication.remarksDosing + '</div>' : ''}
                 ` : ''}
                 <div class="info-box description">
                     <strong>Description:</strong> ${medication.description}
