@@ -13,9 +13,72 @@
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #f3f4f6;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
-      padding: 1rem;
+      padding: 0;
+    }
+    .header {
+      background: #000000;
+      color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .viking-logo {
+      margin-bottom: 2rem;
+    }
+    .viking-logo img {
+      max-height: 80px;
+      width: auto;
+    }
+    .controls-section {
+      margin: 2rem auto;
+      max-width: 600px;
+    }
+    .splash-image {
+      margin: 2rem auto;
+      max-width: 720px;
+      transition: opacity 0.3s ease;
+    }
+    .splash-image img {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+    .splash-image.hidden {
+      opacity: 0;
+      height: 0;
+      overflow: hidden;
+      margin: 0;
+    }
+    .tagline {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .welcome-text {
+      background: #000000;
+      color: white;
+      text-align: center;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+    .welcome-text h2 {
+      color: white;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .welcome-text p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+    .main-content {
+      padding: 2rem 1rem;
     }
     .container {
       max-width: 1200px;
@@ -23,10 +86,11 @@
     }
     .card {
       background: white;
-      border-radius: 0.5rem;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.8);
     }
     h1 {
       font-size: 2rem;
@@ -64,32 +128,41 @@
       color: #374151;
       margin-bottom: 0.5rem;
     }
+    .header label {
+      color: white;
+      font-weight: 600;
+    }
     select {
       width: 100%;
-      padding: 0.5rem;
-      border: 1px solid #d1d5db;
-      border-radius: 0.375rem;
+      padding: 0.75rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
       font-size: 1rem;
       background-color: white;
+      transition: all 0.2s ease;
     }
     select:focus {
       outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
     select:disabled {
-      background-color: #f3f4f6;
+      background-color: #f9fafb;
+      color: #6b7280;
       cursor: not-allowed;
     }
     .medication-card {
-      border: 1px solid #e5e7eb;
-      border-radius: 0.5rem;
-      padding: 1rem;
+      border: 2px solid #f3f4f6;
+      border-radius: 12px;
+      padding: 1.5rem;
       margin-bottom: 1.5rem;
-      transition: box-shadow 0.2s;
+      transition: all 0.3s ease;
+      background: white;
     }
     .medication-card:hover {
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-color: #3b82f6;
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.1);
+      transform: translateY(-2px);
     }
     .medication-grid {
       display: grid;
@@ -121,65 +194,147 @@
     }
     .alert {
       padding: 1rem;
-      background-color: #e0f2fe;
-      border-radius: 0.5rem;
-      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      border: 1px solid #93c5fd;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
     }
     .warning {
       padding: 1rem;
-      background-color: #fef3c7;
-      border-radius: 0.5rem;
-      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border: 1px solid #f59e0b;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
     }
     .hidden {
       display: none;
     }
+    
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .header {
+        padding: 1.5rem 1rem;
+      }
+      .viking-logo img {
+        max-height: 60px;
+      }
+      .tagline {
+        font-size: 1.25rem;
+      }
+      .controls-section {
+        margin: 1.5rem auto;
+      }
+      .splash-image {
+        margin: 1.5rem auto;
+        max-width: 90%;
+      }
+      .main-content {
+        padding: 1rem;
+      }
+      .card {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+      .medication-card {
+        padding: 1rem;
+      }
+      .grid {
+        grid-template-columns: 1fr !important;
+      }
+      .welcome-text {
+        padding: 1rem;
+      }
+      .welcome-text h2 {
+        font-size: 1.25rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .header {
+        padding: 1rem;
+      }
+      .viking-logo img {
+        max-height: 50px;
+      }
+      .tagline {
+        font-size: 1.1rem;
+      }
+      .main-content {
+        padding: 0.75rem;
+      }
+      .card {
+        padding: 1rem;
+      }
+      .welcome-text {
+        padding: 0.75rem;
+      }
+      .welcome-text h2 {
+        font-size: 1.1rem;
+      }
+      .welcome-text p {
+        font-size: 0.9rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="card">
-      <h1>Medication Lookup</h1>
-      
-      <div id="data-status" class="alert">
-        <p><strong>Status:</strong> <span id="med-count">Select a state and patient goal to view available medications</span></p>
+  <div class="header">
+    <div class="header-content">
+      <div class="viking-logo">
+        <img src="viking-logo.png" alt="Viking Alternative Medicine" />
       </div>
       
-      <div class="grid">
-        <div>
-          <label for="state-select">Select State</label>
-          <select id="state-select">
-            <option value="">Choose a state...</option>
-          </select>
+      <div class="tagline">Viking Doesn't Sell Medications - We Sell Transformations</div>
+      
+      <div class="controls-section">
+        <div class="grid">
+          <div>
+            <label for="state-select">Select State</label>
+            <select id="state-select">
+              <option value="">Choose a state...</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="goal-select">Select Patient Goal</label>
+            <select id="goal-select" disabled>
+              <option value="">Choose a goal...</option>
+            </select>
+          </div>
         </div>
-        
-        <div>
-          <label for="goal-select">Select Patient Goal</label>
-          <select id="goal-select" disabled>
-            <option value="">Choose a goal...</option>
-          </select>
-        </div>
+      </div>
+      
+      <div id="splash-image" class="splash-image">
+        <img src="viking-team.png" alt="Viking Team - Help Us / Thank You Viking" />
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="container">
+      <div id="data-status" class="alert hidden">
+        <p><strong>Status:</strong> <span id="med-count">Select a state and patient goal to view available medications</span></p>
       </div>
 
       <p id="select-goal-message" class="text-muted hidden">Please select a patient goal to view available medications.</p>
-    </div>
 
-    <div id="results-section" class="card hidden">
-      <h2 id="results-header"></h2>
-      <div id="medications-list"></div>
-    </div>
+      <div id="results-section" class="card hidden">
+        <h2 id="results-header"></h2>
+        <div id="medications-list"></div>
+      </div>
 
-    <div id="no-results" class="card hidden">
-      <p style="text-align: center;" class="text-muted">
-        No medications available for this combination. 
-        This may be due to pharmacy shipping restrictions.
-      </p>
+      <div id="no-results" class="card hidden">
+        <p style="text-align: center;" class="text-muted">
+          No medications available for this combination. 
+          This may be due to pharmacy shipping restrictions.
+        </p>
+      </div>
     </div>
+  </div>
 
-    <div id="instructions" class="card">
-      <h3>Medication Data Loaded</h3>
-      <p class="text-muted">Your complete Viking medication data has been loaded successfully. Select a state and patient goal to view available medications.</p>
-    </div>
+  <div class="welcome-text">
+    <h2>Welcome to the Viking Alternative Medicine Medical Tree</h2>
+    <p>Please select a patient goal and a state to get started.</p>
   </div>
 
   <script>
@@ -197,7 +352,7 @@
         duration: '10 weeks',
         pharmacy: '',
         remarksDosing: 'Inject 0.5 ml (100 mg) by intramuscular route 2x weekly. Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.',
-        description: 'Testosterone Cypionate is a long-acting form of testosterone, the primary male sex hormone. It\'s used in hormone replacement therapy (HRT) to treat low testosterone levels in adult men (and sometimes women) to help improve mood, energy, libido, muscle mass, fat distribution, and overall quality of life. It\'s administered via intramuscular injection, typically once every 7–10 days.'
+        description: 'This medication is a synthetic form of testosterone used to treat low testosterone levels (hypogonadism) in men. What you can expect: Improved energy levels, increased muscle mass, enhanced libido, better mood, and improved overall quality of life. Effects typically become noticeable within 2-4 weeks. Common side effects: Acne, increased hair growth, mood changes, injection site reactions, increased red blood cell count, and fluid retention. Serious but rare side effects include blood clots, heart problems, and prostate issues. Known interactions: May affect blood sugar levels in diabetics (requiring insulin/medication adjustments), can interact with blood thinners increasing bleeding risk, and may enhance effects of corticosteroids. Should not be used with certain heart medications. **This information is automatically generated with AI. Use this information as a guideline only because AI is capable of making mistakes. Always seek the guidance of your medical provider before starting or stopping the use of any medication.**'
       },
       {
         category: 'Men - Standard TRT Protocol',
@@ -210,7 +365,7 @@
         duration: '10 weeks',
         pharmacy: '',
         remarksDosing: 'Inject 0.5 ml (100 mg) by intramuscular route 2x weekly. Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.',
-        description: 'Alternative testosterone ester for TRT.'
+        description: 'This medication is a synthetic form of testosterone used to treat low testosterone levels (hypogonadism) in men. Testosterone enanthate works similarly to cypionate but may have slightly different absorption patterns. What you can expect: Improved energy levels, increased muscle mass, enhanced libido, better mood, and improved overall quality of life. Effects typically become noticeable within 2-4 weeks. Common side effects: Acne, increased hair growth, mood changes, injection site reactions, increased red blood cell count, and fluid retention. Serious but rare side effects include blood clots, heart problems, and prostate issues. Known interactions: May affect blood sugar levels in diabetics (requiring insulin/medication adjustments), can interact with blood thinners increasing bleeding risk, and may enhance effects of corticosteroids. **This information is automatically generated with AI. Use this information as a guideline only because AI is capable of making mistakes. Always seek the guidance of your medical provider before starting or stopping the use of any medication.**'
       },
       {
         category: 'Men - Standard TRT Protocol',
@@ -223,7 +378,7 @@
         duration: '8 weeks',
         pharmacy: '',
         remarksDosing: 'Up to 1 click 2x per day. Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.',
-        description: 'Topical testosterone replacement therapy 30g.'
+        description: 'This is a topical testosterone replacement therapy cream used to treat low testosterone levels in men. Applied to clean, dry skin, it absorbs through the skin to provide steady hormone levels. What you can expect: Improved energy, increased muscle mass, enhanced libido, and better mood. Effects are typically noticed within 2-4 weeks. The topical form may cause less dramatic hormone fluctuations than injections. Common side effects: Skin irritation at application site, acne, increased body hair, mood changes, and potential transfer to others through skin contact. Important to wash hands after application and cover treated areas. Known interactions: Same as other testosterone forms - may affect blood sugar in diabetics, can interact with blood thinners, and may enhance corticosteroid effects. Skin contact with others should be avoided until absorption is complete. **This information is automatically generated with AI. Use this information as a guideline only because AI is capable of making mistakes. Always seek the guidance of your medical provider before starting or stopping the use of any medication.**'
       },
       {
         category: 'Men - Standard TRT Protocol',
@@ -236,7 +391,7 @@
         duration: '8 weeks',
         pharmacy: '',
         remarksDosing: 'Up to 2 clicks 2x per day. Take ¼ (0.25 mg) - ½ tablet (.5 mg) by mouth 2x weekly.',
-        description: 'Topical testosterone replacement therapy 60g.'
+        description: 'This is a topical testosterone replacement therapy cream used to treat low testosterone levels in men. Applied to clean, dry skin, it absorbs through the skin to provide steady hormone levels. This larger quantity provides more doses per container. What you can expect: Improved energy, increased muscle mass, enhanced libido, and better mood. Effects are typically noticed within 2-4 weeks. Common side effects: Skin irritation at application site, acne, increased body hair, mood changes, and potential transfer to others through skin contact. Important to wash hands after application and cover treated areas. Known interactions: Same as other testosterone forms - may affect blood sugar in diabetics, can interact with blood thinners, and may enhance corticosteroid effects. **This information is automatically generated with AI. Use this information as a guideline only because AI is capable of making mistakes. Always seek the guidance of your medical provider before starting or stopping the use of any medication.**'
       },
       {
         category: 'Men - Standard TRT Protocol',
@@ -2414,18 +2569,18 @@
     ];
 
     const PATIENT_GOALS = [
-      'Men - Standard TRT Protocol',
-      'Men - Standard Add On',
-      'Women - Standard HRT Protocol',
-      'Women - Standard Add On',
-      'Joint Pain/Healing',
-      'Sexual Function',
-      'Vitamins',
+      'Anti-Aging',
       'Hair Loss',
       'Improve Energy',
-      'Anti-Aging',
       'Improve Sleep',
-      'Weight Loss'
+      'Joint Pain/Healing',
+      'Men - Standard Add On',
+      'Men - Standard TRT Protocol',
+      'Sexual Function',
+      'Vitamins',
+      'Weight Loss',
+      'Women - Standard Add On',
+      'Women - Standard HRT Protocol'
     ];
 
     const SHIPMENT_MAP = {
@@ -2538,6 +2693,11 @@
       const list = document.getElementById('medications-list');
       const dataStatus = document.getElementById('data-status');
       const medCount = document.getElementById('med-count');
+      const splashImage = document.getElementById('splash-image');
+      
+      // Hide splash image when displaying results
+      splashImage.classList.add('hidden');
+      dataStatus.classList.remove('hidden');
       
       if (meds.length === 0) {
         resultsSection.classList.add('hidden');
@@ -2590,6 +2750,19 @@
       `).join('');
     }
 
+    // Function to reset to splash state
+    function resetToSplash() {
+      const splashImage = document.getElementById('splash-image');
+      const dataStatus = document.getElementById('data-status');
+      const resultsSection = document.getElementById('results-section');
+      const noResults = document.getElementById('no-results');
+      
+      splashImage.classList.remove('hidden');
+      dataStatus.classList.add('hidden');
+      resultsSection.classList.add('hidden');
+      noResults.classList.add('hidden');
+    }
+
     // Initialize
     function init() {
       console.log('Initializing app...');
@@ -2628,15 +2801,14 @@
           goalSelect.disabled = true;
           goalSelect.value = '';
           document.getElementById('select-goal-message').classList.add('hidden');
-          document.getElementById('results-section').classList.add('hidden');
-          document.getElementById('no-results').classList.add('hidden');
-          // Reset status message when no state selected
-          medCount.textContent = 'Select a state and patient goal to view available medications';
+          resetToSplash();
         }
         
         if (state && goalSelect.value) {
           const filtered = filterMedications(state, goalSelect.value);
           displayMedications(filtered, state, goalSelect.value);
+        } else if (!state && !goalSelect.value) {
+          resetToSplash();
         }
       });
       
@@ -2650,6 +2822,8 @@
           document.getElementById('select-goal-message').classList.add('hidden');
           const filtered = filterMedications(state, goal);
           displayMedications(filtered, state, goal);
+        } else if (!state && !goal) {
+          resetToSplash();
         }
       });
       
