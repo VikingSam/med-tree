@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Medication Lookup App</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/papaparse@latest/papaparse.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -67,12 +64,13 @@
       color: #374151;
       margin-bottom: 0.5rem;
     }
-    select, input[type="file"] {
+    select {
       width: 100%;
       padding: 0.5rem;
       border: 1px solid #d1d5db;
       border-radius: 0.375rem;
       font-size: 1rem;
+      background-color: white;
     }
     select:focus {
       outline: none;
@@ -138,22 +136,6 @@
     .info-box.description {
       background-color: #f9fafb;
     }
-    .loading {
-      text-align: center;
-      padding: 2rem;
-    }
-    .spinner {
-      display: inline-block;
-      width: 3rem;
-      height: 3rem;
-      border: 3px solid #e5e7eb;
-      border-top-color: #2563eb;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
     .text-muted {
       color: #6b7280;
     }
@@ -169,15 +151,85 @@
       border-radius: 0.5rem;
       margin-top: 1.5rem;
     }
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div class="container">
+    <div id="upload-section" class="card">
+      <h1>Medication Lookup App</h1>
+      
+      <p class="text-muted" style="margin-bottom: 1.5rem;">
+        Please upload the medication CSV files to get started:
+      </p>
+      
+      <div class="file-upload">
+        <h3 style="color: #374151; margin-bottom: 0.5rem;">Non-California Medications</h3>
+        <p class="text-sm text-muted">Upload "Viking Medication Converted to Standard Columns UTF.csv"</p>
+        <label class="file-input-label">
+          Choose File
+          <input type="file" id="viking-file" accept=".csv">
+        </label>
+      </div>
+      
+      <div class="file-upload">
+        <h3 style="color: #374151; margin-bottom: 0.5rem;">California Medications</h3>
+        <p class="text-sm text-muted">Upload "ca_meds.csv" or "California Pricing and Products.csv"</p>
+        <label class="file-input-label">
+          Choose File
+          <input type="file" id="ca-file" accept=".csv">
+        </label>
+      </div>
+      
+      <div class="alert">
+        <p class="text-sm">
+          <strong>Note:</strong> The pharmacy shipping restrictions are already built into the app. 
+          You only need to upload the medication files.
+        </p>
+      </div>
+    </div>
 
-  <script type="text/javascript">
-    const { useState, useEffect } = React;
-    const { createRoot } = ReactDOM;
+    <div id="lookup-section" class="hidden">
+      <div class="card">
+        <h1>Medication Lookup</h1>
+        
+        <div class="grid">
+          <div>
+            <label>Select State</label>
+            <select id="state-select">
+              <option value="">Choose a state...</option>
+            </select>
+          </div>
+          
+          <div>
+            <label>Select Patient Goal</label>
+            <select id="goal-select" disabled>
+              <option value="">Choose a goal...</option>
+            </select>
+          </div>
+        </div>
 
+        <p id="select-goal-message" class="text-muted hidden">Please select a patient goal to view available medications.</p>
+      </div>
+
+      <div id="results-section" class="card hidden">
+        <h2 id="results-header"></h2>
+        <div id="medications-list"></div>
+      </div>
+
+      <div id="no-results" class="card hidden">
+        <p style="text-align: center;" class="text-muted">
+          No medications available for this combination. 
+          This may be due to pharmacy shipping restrictions.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Data constants
     const STATES = [
       'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
       'District of Columbia', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa',
@@ -259,103 +311,110 @@
       'Virgin Islands': { Hallandale: false, 'First Choice': false, RiteAway: false, Revive: false, NuBioage: false, ScriptWorks: false }
     };
 
-    function getMedicationDescription(medication) {
-      const descriptions = {
-        'testosterone cypionate': 'Used for TRT to treat low testosterone. Improves energy, muscle, libido. Side effects: acne, hair loss, mood changes.',
-        'testosterone enanthate': 'Long-acting testosterone for HRT. Similar to cypionate. Side effects: acne, hair loss, mood changes.',
-        'anastrozole': 'Reduces estrogen in TRT patients. Prevents gynecomastia. Side effects: joint pain, hot flashes.',
-        'bi-estrogen': 'HRT for menopause symptoms like hot flashes. Side effects: weight gain, blurred vision, tiredness, acne.',
-        'progesterone': 'Supports hormonal balance in HRT. Improves sleep, mood. Side effects: abdominal pain, bloating, blurred vision, nausea.',
-        'clomiphene': 'Stimulates testosterone in men or ovulation in women. Side effects: hot flashes, headaches.',
-        'clomid': 'Same as Clomiphene. Stimulates hormone production. Side effects: hot flashes, headaches.',
-        'estrogen patch': 'HRT for menopause. Reduces hot flashes, vaginal dryness. Side effects: bloating, breast tenderness, headaches, nausea.',
-        'dhea': 'Supports hormone production. May improve energy, mood. Side effects: oily skin, acne, hair loss, upset stomach.',
-        'pregnenolone': 'Precursor hormone for others. May aid memory, mood. Side effects: overstimulation, insomnia, irritability, acne, headache.',
-        'nandrolone': 'For joint pain, muscle wasting. Relieves hypogonadal joint pain. Side effects: headaches, acne, diarrhea, edema.',
-        'l carnitine': 'Aids fat burning, energy. For healing, performance. Side effects: stomach upset, heartburn, diarrhea, seizures.',
-        'sermorelin': 'Stimulates growth hormone release. Anti-aging, energy. Side effects: injection site reactions, headache, flushing, nausea.',
-        'cjc 1295': 'Boosts GH for muscle, fat loss. Side effects: headaches, flu-like symptoms, irritability, nausea.',
-        'ipamorelin': 'Growth hormone peptide. Works with CJC 1295. Side effects: headaches, flu-like symptoms.',
-        'bpc': 'Promotes healing, wound repair. For tendons, ligaments. Side effects: unknown in humans, potential injection reactions.',
-        'tb500': 'Aids tissue repair, flexibility. Side effects: fatigue, headaches, dizziness, injection site irritation.',
-        'tb4': 'Same as TB500. Thymosin Beta 4 for healing.',
-        'sildenafil': 'Treats ED by increasing blood flow. Side effects: headache, flushing, nausea, stuffy nose.',
-        'viagra': 'Brand name for Sildenafil. Treats ED. Side effects: headache, flushing, nausea.',
-        'tadalafil': 'Treats ED, longer-lasting. Side effects: headache, flushing, back pain, nausea.',
-        'cialis': 'Brand name for Tadalafil. Long-lasting ED treatment.',
-        'pt 141': 'Boosts libido, arousal. Side effects: nausea (common), vomiting, flushing, headache.',
-        'bremelanotide': 'Same as PT 141. Enhances sexual desire.',
-        'oxytocin': 'Enhances bonding, may aid sexual function. Side effects: headache, nausea, vomiting, rapid heartbeat.',
-        'scream cream': 'Topical for female arousal. Side effects: itching, redness, dryness, dizziness, headaches.',
-        'glutathione': 'Antioxidant for detox, skin. Side effects: rash (topical), nausea, abdominal cramps (injections).',
-        'lipo b': 'Fat-burning injection with B vitamins. Side effects: allergic reactions, anxiety, constipation, diarrhea.',
-        'mic b12': 'Weight loss blend with B12. Side effects: pain at site, nausea, vomiting, diarrhea.',
-        'bioboost': 'Energy and metabolism support. Contains B vitamins.',
-        'vitamin b12': 'For energy, deficiency. Side effects: mild diarrhea, itching, swelling sensation.',
-        'lipo c': 'Lipotropic for fat loss. Side effects: pain/swelling at site, nausea, gastrointestinal issues.',
-        'finasteride': 'For hair loss. Blocks DHT. Side effects: sexual dysfunction, depression.',
-        'minoxidil': 'For hair loss. Promotes growth. Side effects: itching, scalp irritation.',
-        'metformin': 'Blood sugar control for weight loss. Side effects: nausea, diarrhea, stomach upset.',
-        'phentermine': 'Appetite suppressant. Side effects: dry mouth, insomnia, increased heart rate.',
-        'semaglutide': 'GLP-1 for weight loss. Side effects: nausea, vomiting, diarrhea.',
-        'tirzepatide': 'Dual GIP/GLP-1 for weight loss. Side effects: nausea, decreased appetite.',
-        'melatonin': 'Sleep hormone supplement. Side effects: drowsiness, headache, dizziness.',
-        'trazodone': 'Sleep aid, antidepressant. Side effects: drowsiness, dry mouth, dizziness.',
-        'hcg': 'Human chorionic gonadotropin. Stimulates testosterone. Side effects: headache, irritability, fatigue.',
-        'gonadorelin': 'Stimulates LH/FSH release. Alternative to HCG. Side effects: injection site reactions.',
-        'enclomiphene': 'Selective estrogen receptor modulator. Boosts testosterone. Side effects: hot flashes, headaches.',
-        'tamoxifen': 'SERM for estrogen blocking. Side effects: hot flashes, nausea.',
-        'exemestane': 'Aromatase inhibitor. Reduces estrogen. Side effects: joint pain, fatigue.',
-        'letrozole': 'Aromatase inhibitor. Very potent. Side effects: joint pain, hot flashes.',
-        'cabergoline': 'Dopamine agonist. Reduces prolactin. Side effects: nausea, dizziness.',
-        'kyzatrex': 'Oral testosterone undecanoate. Alternative to injections. Side effects: similar to other testosterone.',
-        'pregnyl': 'Brand name for HCG. Used in fertility and testosterone support.'
-      };
+    // Global variables
+    let medications = [];
+    let caMedications = [];
 
+    // Medication descriptions
+    function getMedicationDescription(medication) {
       if (!medication) return 'Medication information not available.';
       
       const medLower = medication.toLowerCase();
       
-      for (const [key, desc] of Object.entries(descriptions)) {
-        if (medLower.includes(key)) {
-          return desc;
-        }
-      }
+      if (medLower.includes('testosterone cypionate')) return 'Used for TRT to treat low testosterone. Improves energy, muscle, libido. Side effects: acne, hair loss, mood changes.';
+      if (medLower.includes('testosterone enanthate')) return 'Long-acting testosterone for HRT. Similar to cypionate. Side effects: acne, hair loss, mood changes.';
+      if (medLower.includes('anastrozole')) return 'Reduces estrogen in TRT patients. Prevents gynecomastia. Side effects: joint pain, hot flashes.';
+      if (medLower.includes('bi-estrogen')) return 'HRT for menopause symptoms like hot flashes. Side effects: weight gain, blurred vision, tiredness, acne.';
+      if (medLower.includes('progesterone')) return 'Supports hormonal balance in HRT. Improves sleep, mood. Side effects: abdominal pain, bloating, blurred vision, nausea.';
+      if (medLower.includes('clomiphene') || medLower.includes('clomid')) return 'Stimulates testosterone in men or ovulation in women. Side effects: hot flashes, headaches.';
+      if (medLower.includes('estrogen patch')) return 'HRT for menopause. Reduces hot flashes, vaginal dryness. Side effects: bloating, breast tenderness, headaches, nausea.';
+      if (medLower.includes('dhea')) return 'Supports hormone production. May improve energy, mood. Side effects: oily skin, acne, hair loss, upset stomach.';
+      if (medLower.includes('pregnenolone')) return 'Precursor hormone for others. May aid memory, mood. Side effects: overstimulation, insomnia, irritability, acne, headache.';
+      if (medLower.includes('nandrolone')) return 'For joint pain, muscle wasting. Relieves hypogonadal joint pain. Side effects: headaches, acne, diarrhea, edema.';
+      if (medLower.includes('l carnitine')) return 'Aids fat burning, energy. For healing, performance. Side effects: stomach upset, heartburn, diarrhea, seizures.';
+      if (medLower.includes('sermorelin')) return 'Stimulates growth hormone release. Anti-aging, energy. Side effects: injection site reactions, headache, flushing, nausea.';
+      if (medLower.includes('cjc 1295')) return 'Boosts GH for muscle, fat loss. Side effects: headaches, flu-like symptoms, irritability, nausea.';
+      if (medLower.includes('ipamorelin')) return 'Growth hormone peptide. Works with CJC 1295. Side effects: headaches, flu-like symptoms.';
+      if (medLower.includes('bpc')) return 'Promotes healing, wound repair. For tendons, ligaments. Side effects: unknown in humans, potential injection reactions.';
+      if (medLower.includes('tb500') || medLower.includes('tb4')) return 'Aids tissue repair, flexibility. Side effects: fatigue, headaches, dizziness, injection site irritation.';
+      if (medLower.includes('sildenafil') || medLower.includes('viagra')) return 'Treats ED by increasing blood flow. Side effects: headache, flushing, nausea, stuffy nose.';
+      if (medLower.includes('tadalafil') || medLower.includes('cialis')) return 'Treats ED, longer-lasting. Side effects: headache, flushing, back pain, nausea.';
+      if (medLower.includes('pt 141') || medLower.includes('bremelanotide')) return 'Boosts libido, arousal. Side effects: nausea (common), vomiting, flushing, headache.';
+      if (medLower.includes('oxytocin')) return 'Enhances bonding, may aid sexual function. Side effects: headache, nausea, vomiting, rapid heartbeat.';
+      if (medLower.includes('scream cream')) return 'Topical for female arousal. Side effects: itching, redness, dryness, dizziness, headaches.';
+      if (medLower.includes('glutathione')) return 'Antioxidant for detox, skin. Side effects: rash (topical), nausea, abdominal cramps (injections).';
+      if (medLower.includes('lipo b')) return 'Fat-burning injection with B vitamins. Side effects: allergic reactions, anxiety, constipation, diarrhea.';
+      if (medLower.includes('mic b12') || medLower.includes('bioboost')) return 'Weight loss blend with B12. Side effects: pain at site, nausea, vomiting, diarrhea.';
+      if (medLower.includes('vitamin b12')) return 'For energy, deficiency. Side effects: mild diarrhea, itching, swelling sensation.';
+      if (medLower.includes('lipo c')) return 'Lipotropic for fat loss. Side effects: pain/swelling at site, nausea, gastrointestinal issues.';
+      if (medLower.includes('finasteride')) return 'For hair loss. Blocks DHT. Side effects: sexual dysfunction, depression.';
+      if (medLower.includes('minoxidil')) return 'For hair loss. Promotes growth. Side effects: itching, scalp irritation.';
+      if (medLower.includes('metformin')) return 'Blood sugar control for weight loss. Side effects: nausea, diarrhea, stomach upset.';
+      if (medLower.includes('phentermine')) return 'Appetite suppressant. Side effects: dry mouth, insomnia, increased heart rate.';
+      if (medLower.includes('semaglutide')) return 'GLP-1 for weight loss. Side effects: nausea, vomiting, diarrhea.';
+      if (medLower.includes('tirzepatide')) return 'Dual GIP/GLP-1 for weight loss. Side effects: nausea, decreased appetite.';
+      if (medLower.includes('melatonin')) return 'Sleep hormone supplement. Side effects: drowsiness, headache, dizziness.';
+      if (medLower.includes('trazodone')) return 'Sleep aid, antidepressant. Side effects: drowsiness, dry mouth, dizziness.';
+      if (medLower.includes('hcg') || medLower.includes('pregnyl')) return 'Human chorionic gonadotropin. Stimulates testosterone. Side effects: headache, irritability, fatigue.';
+      if (medLower.includes('gonadorelin')) return 'Stimulates LH/FSH release. Alternative to HCG. Side effects: injection site reactions.';
+      if (medLower.includes('enclomiphene')) return 'Selective estrogen receptor modulator. Boosts testosterone. Side effects: hot flashes, headaches.';
+      if (medLower.includes('tamoxifen')) return 'SERM for estrogen blocking. Side effects: hot flashes, nausea.';
+      if (medLower.includes('exemestane')) return 'Aromatase inhibitor. Reduces estrogen. Side effects: joint pain, fatigue.';
+      if (medLower.includes('letrozole')) return 'Aromatase inhibitor. Very potent. Side effects: joint pain, hot flashes.';
+      if (medLower.includes('cabergoline')) return 'Dopamine agonist. Reduces prolactin. Side effects: nausea, dizziness.';
+      if (medLower.includes('kyzatrex')) return 'Oral testosterone undecanoate. Alternative to injections. Side effects: similar to other testosterone.';
       
-      if (medLower.includes('testosterone')) {
-        return 'Testosterone replacement therapy. Side effects: acne, hair loss, mood changes.';
-      }
-      if (medLower.includes('estrogen') || medLower.includes('bi-est')) {
-        return 'Estrogen hormone replacement. Side effects: bloating, breast tenderness.';
-      }
-      if (medLower.includes('vitamin') || medLower.includes('b12')) {
-        return 'Vitamin supplementation for energy and health.';
-      }
+      if (medLower.includes('testosterone')) return 'Testosterone replacement therapy. Side effects: acne, hair loss, mood changes.';
+      if (medLower.includes('estrogen') || medLower.includes('bi-est')) return 'Estrogen hormone replacement. Side effects: bloating, breast tenderness.';
+      if (medLower.includes('vitamin') || medLower.includes('b12')) return 'Vitamin supplementation for energy and health.';
       
       return 'Medication information not available. Please consult your healthcare provider.';
     }
 
-    function parseMedications(csvData, isCA = false) {
-      const lines = csvData.split('\n').map(line => line.trim()).filter(line => line);
-      const medications = [];
+    // Parse CSV manually
+    function parseCSV(text) {
+      const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+      const result = [];
+      
+      for (let i = 0; i < lines.length; i++) {
+        const row = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let j = 0; j < lines[i].length; j++) {
+          const char = lines[i][j];
+          
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            row.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        
+        row.push(current.trim());
+        result.push(row);
+      }
+      
+      return result;
+    }
+
+    // Parse medications
+    function parseMedications(csvText, isCA) {
+      const rows = parseCSV(csvText);
+      const meds = [];
       let currentCategory = null;
       let headerIndices = null;
       
-      for (let i = 0; i < lines.length; i++) {
-        const parsed = Papa.parse(lines[i], { 
-          dynamicTyping: true,
-          skipEmptyLines: true 
-        });
-        
-        if (parsed.data.length === 0) continue;
-        
-        const row = parsed.data[0];
-        
-        if (!row || row.every(cell => !cell)) continue;
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || row.length === 0) continue;
         
         const firstCell = String(row[0] || '');
         
-        // Check if this is a category header
+        // Check if this is a category
         if (PATIENT_GOALS.some(goal => firstCell.includes(goal))) {
           currentCategory = PATIENT_GOALS.find(goal => firstCell.includes(goal));
           continue;
@@ -365,22 +424,23 @@
         if (firstCell === 'Medication' || firstCell.toLowerCase().includes('medication')) {
           headerIndices = {
             medication: 0,
-            syringes: row.findIndex(h => h && String(h).toLowerCase().includes('syringe')),
-            delivery: row.findIndex(h => h && (String(h).toLowerCase().includes('delivery') || String(h).toLowerCase() === 'type')),
-            strength: row.findIndex(h => h && String(h).toLowerCase().includes('strength')),
-            quantity: row.findIndex(h => h && String(h).toLowerCase().includes('quantity')),
-            price: row.findIndex(h => h && String(h).toLowerCase().includes('price')),
-            duration: row.findIndex(h => h && String(h).toLowerCase().includes('duration')),
-            pharmacy: row.findIndex(h => h && String(h).toLowerCase().includes('pharmacy')),
-            remarksDosing: row.findIndex(h => h && (String(h).toLowerCase().includes('remark') || String(h).toLowerCase().includes('dosing'))),
-            description: row.findIndex(h => h && String(h).toLowerCase().includes('description'))
+            syringes: row.findIndex(h => h && h.toLowerCase().includes('syringe')),
+            delivery: row.findIndex(h => h && (h.toLowerCase().includes('delivery') || h.toLowerCase() === 'type')),
+            strength: row.findIndex(h => h && h.toLowerCase().includes('strength')),
+            quantity: row.findIndex(h => h && h.toLowerCase().includes('quantity')),
+            price: row.findIndex(h => h && h.toLowerCase().includes('price')),
+            duration: row.findIndex(h => h && h.toLowerCase().includes('duration')),
+            pharmacy: row.findIndex(h => h && h.toLowerCase().includes('pharmacy')),
+            remarksDosing: row.findIndex(h => h && (h.toLowerCase().includes('remark') || h.toLowerCase().includes('dosing'))),
+            description: row.findIndex(h => h && h.toLowerCase().includes('description'))
           };
           continue;
         }
         
+        // Skip if we don't have a category yet
         if (!currentCategory || !headerIndices) continue;
         
-        // Skip rows that look like sub-headers or notes
+        // Skip notes and empty rows
         if (firstCell.toLowerCase().includes('note') || 
             firstCell.toLowerCase().includes('standard add on') ||
             firstCell === '$100 CONSULT FEE' ||
@@ -388,7 +448,7 @@
           continue;
         }
         
-        // Parse medication row
+        // Parse medication
         if (firstCell && firstCell.trim()) {
           const med = {
             category: currentCategory,
@@ -409,245 +469,190 @@
             med.description = getMedicationDescription(med.medication);
           }
           
-          medications.push(med);
+          meds.push(med);
         }
       }
       
-      return medications;
+      return meds;
     }
 
-    function App() {
-      const [medications, setMedications] = useState([]);
-      const [caMedications, setCaMedications] = useState([]);
-      const [selectedState, setSelectedState] = useState('');
-      const [selectedGoal, setSelectedGoal] = useState('');
-      const [loading, setLoading] = useState(false);
-      const [dataLoaded, setDataLoaded] = useState(false);
-      const [filteredMedications, setFilteredMedications] = useState([]);
-
-      const handleFileUpload = (event, fileType) => {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        setLoading(true);
-        const reader = new FileReader();
+    // Filter medications
+    function filterMedications(state, goal) {
+      const medList = state === 'California' ? caMedications : medications;
+      
+      let filtered = medList.filter(med => med.category === goal);
+      
+      if (state !== 'California') {
+        const stateShipping = SHIPMENT_MAP[state] || {};
         
-        reader.onload = (e) => {
-          const content = e.target.result;
-          
-          if (fileType === 'viking') {
-            const meds = parseMedications(content, false);
-            setMedications(meds);
-          } else if (fileType === 'ca') {
-            const meds = parseMedications(content, true);
-            setCaMedications(meds);
+        filtered = filtered.filter(med => {
+          if (!med.pharmacy || med.pharmacy === 'null' || med.pharmacy.trim() === '') {
+            return Object.values(stateShipping).some(ships => ships);
           }
           
-          if ((fileType === 'viking' && caMedications.length > 0) || 
-              (fileType === 'ca' && medications.length > 0)) {
-            setDataLoaded(true);
+          const pharmacies = med.pharmacy.split(',').map(p => p.trim());
+          
+          if (med.medication.toLowerCase().includes('hcg') || 
+              med.medication.toLowerCase().includes('pregnyl') ||
+              med.medication.toLowerCase().includes('gonadorelin')) {
+            return stateShipping['RiteAway'] || stateShipping['Revive'];
           }
           
-          setLoading(false);
-        };
-        
-        reader.readAsText(file);
-      };
-
-      useEffect(() => {
-        if (!selectedState || !selectedGoal) {
-          setFilteredMedications([]);
-          return;
-        }
-        
-        const medList = selectedState === 'California' ? caMedications : medications;
-        
-        let filtered = medList.filter(med => med.category === selectedGoal);
-        
-        if (selectedState !== 'California') {
-          const stateShipping = SHIPMENT_MAP[selectedState] || {};
-          
-          filtered = filtered.filter(med => {
-            if (!med.pharmacy || med.pharmacy === 'null' || med.pharmacy.trim() === '') {
-              return Object.values(stateShipping).some(ships => ships);
-            }
-            
-            const pharmacies = med.pharmacy.split(',').map(p => p.trim());
-            
-            if (med.medication.toLowerCase().includes('hcg') || 
-                med.medication.toLowerCase().includes('pregnyl') ||
-                med.medication.toLowerCase().includes('gonadorelin')) {
-              return stateShipping['RiteAway'] || stateShipping['Revive'];
-            }
-            
-            return pharmacies.some(pharmacy => {
-              if (pharmacy.includes('Hallandale')) return stateShipping['Hallandale'];
-              if (pharmacy.includes('First Choice') || pharmacy.includes('1st Choice')) return stateShipping['First Choice'];
-              if (pharmacy.includes('Rite Away') || pharmacy.includes('RiteAway')) return stateShipping['RiteAway'];
-              if (pharmacy.includes('Revive')) return stateShipping['Revive'];
-              if (pharmacy.includes('NuBioage') || pharmacy.includes('NuBiage')) return stateShipping['NuBioage'];
-              
-              return true;
-            });
+          return pharmacies.some(pharmacy => {
+            if (pharmacy.includes('Hallandale')) return stateShipping['Hallandale'];
+            if (pharmacy.includes('First Choice') || pharmacy.includes('1st Choice')) return stateShipping['First Choice'];
+            if (pharmacy.includes('Rite Away') || pharmacy.includes('RiteAway')) return stateShipping['RiteAway'];
+            if (pharmacy.includes('Revive')) return stateShipping['Revive'];
+            if (pharmacy.includes('NuBioage') || pharmacy.includes('NuBiage')) return stateShipping['NuBioage'];
+            return true;
           });
-        }
-        
-        setFilteredMedications(filtered);
-      }, [selectedState, selectedGoal, medications, caMedications]);
-
-      if (!dataLoaded) {
-        return (
-          <div className="container">
-            <div className="card">
-              <h1>Medication Lookup App</h1>
-              
-              <p className="text-muted" style={{ marginBottom: '1.5rem' }}>
-                Please upload the medication CSV files to get started:
-              </p>
-              
-              <div className="file-upload">
-                <h3 style={{ color: '#374151', marginBottom: '0.5rem' }}>Non-California Medications</h3>
-                <p className="text-sm text-muted">Upload "Viking Medication Converted to Standard Columns UTF.csv"</p>
-                <label className="file-input-label">
-                  Choose File
-                  <input
-                    type="file"
-                    accept=".csv"
-                    onChange={(e) => handleFileUpload(e, 'viking')}
-                  />
-                </label>
-              </div>
-              
-              <div className="file-upload">
-                <h3 style={{ color: '#374151', marginBottom: '0.5rem' }}>California Medications</h3>
-                <p className="text-sm text-muted">Upload "ca_meds.csv" or "California Pricing and Products.csv"</p>
-                <label className="file-input-label">
-                  Choose File
-                  <input
-                    type="file"
-                    accept=".csv"
-                    onChange={(e) => handleFileUpload(e, 'ca')}
-                  />
-                </label>
-              </div>
-              
-              {loading && (
-                <div className="loading">
-                  <div className="spinner"></div>
-                  <p className="text-muted" style={{ marginTop: '0.5rem' }}>Processing file...</p>
-                </div>
-              )}
-              
-              <div className="alert">
-                <p className="text-sm">
-                  <strong>Note:</strong> The pharmacy shipping restrictions are already built into the app. 
-                  You only need to upload the medication files.
-                </p>
-              </div>
-            </div>
-          </div>
-        );
+        });
       }
-
-      return (
-        <div className="container">
-          <div className="card">
-            <h1>Medication Lookup</h1>
-            
-            <div className="grid">
-              <div>
-                <label>Select State</label>
-                <select
-                  value={selectedState}
-                  onChange={(e) => setSelectedState(e.target.value)}
-                >
-                  <option value="">Choose a state...</option>
-                  {STATES.map(state => (
-                    <option key={state} value={state}>{state}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div>
-                <label>Select Patient Goal</label>
-                <select
-                  value={selectedGoal}
-                  onChange={(e) => setSelectedGoal(e.target.value)}
-                  disabled={!selectedState}
-                >
-                  <option value="">Choose a goal...</option>
-                  {PATIENT_GOALS.map(goal => (
-                    <option key={goal} value={goal}>{goal}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {selectedState && !selectedGoal && (
-              <p className="text-muted">Please select a patient goal to view available medications.</p>
-            )}
-          </div>
-
-          {filteredMedications.length > 0 && (
-            <div className="card">
-              <h2>Available Medications for {selectedGoal} in {selectedState}</h2>
-              
-              <div>
-                {filteredMedications.map((med, index) => (
-                  <div key={index} className="medication-card">
-                    <h3>{med.medication}</h3>
-                    
-                    <div className="medication-grid">
-                      <div>
-                        {med.delivery && <p><span className="font-medium">Delivery:</span> {med.delivery}</p>}
-                        {med.strength && <p><span className="font-medium">Strength:</span> {med.strength}</p>}
-                        {med.quantity && <p><span className="font-medium">Quantity:</span> {med.quantity}</p>}
-                        {med.price && <p><span className="font-medium">Price:</span> {med.price}</p>}
-                      </div>
-                      <div>
-                        {med.duration && <p><span className="font-medium">Duration:</span> {med.duration}</p>}
-                        {med.syringes && med.syringes !== 'null' && (
-                          <p><span className="font-medium">Syringes:</span> {med.syringes}</p>
-                        )}
-                        {med.pharmacy && med.pharmacy !== 'null' && (
-                          <p><span className="font-medium">Pharmacy:</span> {med.pharmacy}</p>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {med.remarksDosing && med.remarksDosing !== 'null' && (
-                      <div className="info-box dosing">
-                        <p className="font-medium">Dosing Instructions:</p>
-                        <p className="text-muted">{med.remarksDosing}</p>
-                      </div>
-                    )}
-                    
-                    {med.description && (
-                      <div className="info-box description">
-                        <p className="font-medium">Description:</p>
-                        <p className="text-muted">{med.description}</p>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {selectedState && selectedGoal && filteredMedications.length === 0 && (
-            <div className="card">
-              <p style={{ textAlign: 'center' }} className="text-muted">
-                No medications available for {selectedGoal} in {selectedState}. 
-                This may be due to pharmacy shipping restrictions.
-              </p>
-            </div>
-          )}
-        </div>
-      );
+      
+      return filtered;
     }
 
-    const root = createRoot(document.getElementById('root'));
-    root.render(React.createElement(App));
+    // Display medications
+    function displayMedications(meds, state, goal) {
+      const resultsSection = document.getElementById('results-section');
+      const noResults = document.getElementById('no-results');
+      const header = document.getElementById('results-header');
+      const list = document.getElementById('medications-list');
+      
+      if (meds.length === 0) {
+        resultsSection.classList.add('hidden');
+        noResults.classList.remove('hidden');
+        return;
+      }
+      
+      noResults.classList.add('hidden');
+      resultsSection.classList.remove('hidden');
+      
+      header.textContent = `Available Medications for ${goal} in ${state}`;
+      
+      list.innerHTML = meds.map(med => `
+        <div class="medication-card">
+          <h3>${med.medication}</h3>
+          
+          <div class="medication-grid">
+            <div>
+              ${med.delivery ? `<p><span class="font-medium">Delivery:</span> ${med.delivery}</p>` : ''}
+              ${med.strength ? `<p><span class="font-medium">Strength:</span> ${med.strength}</p>` : ''}
+              ${med.quantity ? `<p><span class="font-medium">Quantity:</span> ${med.quantity}</p>` : ''}
+              ${med.price ? `<p><span class="font-medium">Price:</span> ${med.price}</p>` : ''}
+            </div>
+            <div>
+              ${med.duration ? `<p><span class="font-medium">Duration:</span> ${med.duration}</p>` : ''}
+              ${med.syringes && med.syringes !== 'null' ? `<p><span class="font-medium">Syringes:</span> ${med.syringes}</p>` : ''}
+              ${med.pharmacy && med.pharmacy !== 'null' ? `<p><span class="font-medium">Pharmacy:</span> ${med.pharmacy}</p>` : ''}
+            </div>
+          </div>
+          
+          ${med.remarksDosing && med.remarksDosing !== 'null' ? `
+            <div class="info-box dosing">
+              <p class="font-medium">Dosing Instructions:</p>
+              <p class="text-muted">${med.remarksDosing}</p>
+            </div>
+          ` : ''}
+          
+          ${med.description ? `
+            <div class="info-box description">
+              <p class="font-medium">Description:</p>
+              <p class="text-muted">${med.description}</p>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      const vikingFile = document.getElementById('viking-file');
+      const caFile = document.getElementById('ca-file');
+      const stateSelect = document.getElementById('state-select');
+      const goalSelect = document.getElementById('goal-select');
+      
+      // Populate states
+      STATES.forEach(state => {
+        const option = document.createElement('option');
+        option.value = state;
+        option.textContent = state;
+        stateSelect.appendChild(option);
+      });
+      
+      // Populate goals
+      PATIENT_GOALS.forEach(goal => {
+        const option = document.createElement('option');
+        option.value = goal;
+        option.textContent = goal;
+        goalSelect.appendChild(option);
+      });
+      
+      // File uploads
+      vikingFile.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            medications = parseMedications(event.target.result, false);
+            checkDataLoaded();
+          };
+          reader.readAsText(file);
+        }
+      });
+      
+      caFile.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            caMedications = parseMedications(event.target.result, true);
+            checkDataLoaded();
+          };
+          reader.readAsText(file);
+        }
+      });
+      
+      // Check if both files loaded
+      function checkDataLoaded() {
+        if (medications.length > 0 && caMedications.length > 0) {
+          document.getElementById('upload-section').classList.add('hidden');
+          document.getElementById('lookup-section').classList.remove('hidden');
+        }
+      }
+      
+      // State selection
+      stateSelect.addEventListener('change', function() {
+        const state = this.value;
+        if (state) {
+          goalSelect.disabled = false;
+          document.getElementById('select-goal-message').classList.remove('hidden');
+        } else {
+          goalSelect.disabled = true;
+          goalSelect.value = '';
+          document.getElementById('select-goal-message').classList.add('hidden');
+          document.getElementById('results-section').classList.add('hidden');
+          document.getElementById('no-results').classList.add('hidden');
+        }
+        
+        if (state && goalSelect.value) {
+          const filtered = filterMedications(state, goalSelect.value);
+          displayMedications(filtered, state, goalSelect.value);
+        }
+      });
+      
+      // Goal selection
+      goalSelect.addEventListener('change', function() {
+        const state = stateSelect.value;
+        const goal = this.value;
+        
+        if (state && goal) {
+          document.getElementById('select-goal-message').classList.add('hidden');
+          const filtered = filterMedications(state, goal);
+          displayMedications(filtered, state, goal);
+        }
+      });
+    });
   </script>
 </body>
 </html>
