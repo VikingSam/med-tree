@@ -81,29 +81,6 @@
       background-color: #f3f4f6;
       cursor: not-allowed;
     }
-    .file-upload {
-      border: 2px dashed #d1d5db;
-      border-radius: 0.5rem;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    .file-input-label {
-      display: inline-block;
-      padding: 0.5rem 1rem;
-      background-color: #eff6ff;
-      color: #2563eb;
-      border-radius: 0.375rem;
-      cursor: pointer;
-      font-weight: 600;
-      margin-top: 0.5rem;
-    }
-    .file-input-label:hover {
-      background-color: #dbeafe;
-    }
-    input[type="file"] {
-      display: none;
-    }
     .medication-card {
       border: 1px solid #e5e7eb;
       border-radius: 0.5rem;
@@ -136,6 +113,22 @@
     .info-box.description {
       background-color: #f9fafb;
     }
+    .loading {
+      text-align: center;
+      padding: 2rem;
+    }
+    .spinner {
+      display: inline-block;
+      width: 3rem;
+      height: 3rem;
+      border: 3px solid #e5e7eb;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
     .text-muted {
       color: #6b7280;
     }
@@ -149,7 +142,14 @@
       padding: 1rem;
       background-color: #fef3c7;
       border-radius: 0.5rem;
-      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .error {
+      padding: 1rem;
+      background-color: #fee2e2;
+      border-radius: 0.5rem;
+      color: #dc2626;
+      margin-bottom: 1rem;
     }
     .hidden {
       display: none;
@@ -158,37 +158,25 @@
 </head>
 <body>
   <div class="container">
-    <div id="upload-section" class="card">
+    <div id="loading-section" class="card">
       <h1>Medication Lookup App</h1>
-      
-      <p class="text-muted" style="margin-bottom: 1.5rem;">
-        Please upload the medication CSV files to get started:
+      <div class="loading">
+        <div class="spinner"></div>
+        <p class="text-muted" style="margin-top: 1rem;">Loading medication data...</p>
+      </div>
+    </div>
+
+    <div id="error-section" class="card hidden">
+      <h1>Medication Lookup App</h1>
+      <div class="error">
+        <p><strong>Error loading data:</strong></p>
+        <p id="error-message"></p>
+      </div>
+      <p class="text-sm text-muted" style="margin-top: 1rem;">
+        Please make sure the CSV files are uploaded to the repository:
+        <br>• viking-meds.csv (or "Viking Medication Converted to Standard Columns UTF.csv")
+        <br>• ca_meds.csv (or "California Pricing and Products.csv")
       </p>
-      
-      <div class="file-upload">
-        <h3 style="color: #374151; margin-bottom: 0.5rem;">Non-California Medications</h3>
-        <p class="text-sm text-muted">Upload "Viking Medication Converted to Standard Columns UTF.csv"</p>
-        <label class="file-input-label">
-          Choose File
-          <input type="file" id="viking-file" accept=".csv">
-        </label>
-      </div>
-      
-      <div class="file-upload">
-        <h3 style="color: #374151; margin-bottom: 0.5rem;">California Medications</h3>
-        <p class="text-sm text-muted">Upload "ca_meds.csv" or "California Pricing and Products.csv"</p>
-        <label class="file-input-label">
-          Choose File
-          <input type="file" id="ca-file" accept=".csv">
-        </label>
-      </div>
-      
-      <div class="alert">
-        <p class="text-sm">
-          <strong>Note:</strong> The pharmacy shipping restrictions are already built into the app. 
-          You only need to upload the medication files.
-        </p>
-      </div>
     </div>
 
     <div id="lookup-section" class="hidden">
@@ -229,6 +217,12 @@
   </div>
 
   <script>
+    // Configuration - UPDATE THESE WITH YOUR ACTUAL FILE NAMES
+    const FILE_URLS = {
+      viking: 'viking-meds.csv',  // or 'Viking Medication Converted to Standard Columns UTF.csv'
+      ca: 'ca_meds.csv'  // or 'California Pricing and Products.csv'
+    };
+
     // Data constants
     const STATES = [
       'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
@@ -363,6 +357,7 @@
       if (medLower.includes('letrozole')) return 'Aromatase inhibitor. Very potent. Side effects: joint pain, hot flashes.';
       if (medLower.includes('cabergoline')) return 'Dopamine agonist. Reduces prolactin. Side effects: nausea, dizziness.';
       if (medLower.includes('kyzatrex')) return 'Oral testosterone undecanoate. Alternative to injections. Side effects: similar to other testosterone.';
+      if (medLower.includes('pregnyl')) return 'Brand name for HCG. Used in fertility and testosterone support.';
       
       if (medLower.includes('testosterone')) return 'Testosterone replacement therapy. Side effects: acne, hair loss, mood changes.';
       if (medLower.includes('estrogen') || medLower.includes('bi-est')) return 'Estrogen hormone replacement. Side effects: bloating, breast tenderness.';
@@ -373,19 +368,28 @@
 
     // Parse CSV manually
     function parseCSV(text) {
-      const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+      const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
       const result = [];
       
       for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (!line.trim()) continue;
+        
         const row = [];
         let current = '';
         let inQuotes = false;
         
-        for (let j = 0; j < lines[i].length; j++) {
-          const char = lines[i][j];
+        for (let j = 0; j < line.length; j++) {
+          const char = line[j];
+          const nextChar = line[j + 1];
           
           if (char === '"') {
-            inQuotes = !inQuotes;
+            if (inQuotes && nextChar === '"') {
+              current += '"';
+              j++;
+            } else {
+              inQuotes = !inQuotes;
+            }
           } else if (char === ',' && !inQuotes) {
             row.push(current.trim());
             current = '';
@@ -395,7 +399,10 @@
         }
         
         row.push(current.trim());
-        result.push(row);
+        
+        if (row.some(cell => cell && cell.trim())) {
+          result.push(row);
+        }
       }
       
       return result;
@@ -407,6 +414,12 @@
       const meds = [];
       let currentCategory = null;
       let headerIndices = null;
+      let headerFound = false;
+      
+      if (isCA) {
+        currentCategory = 'Men - Standard TRT Protocol';
+        headerFound = true;
+      }
       
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
@@ -414,14 +427,39 @@
         
         const firstCell = String(row[0] || '');
         
-        // Check if this is a category
-        if (PATIENT_GOALS.some(goal => firstCell.includes(goal))) {
-          currentCategory = PATIENT_GOALS.find(goal => firstCell.includes(goal));
+        if (isCA && i < 2 && (firstCell.includes('MEN') || firstCell.includes('CONSULT'))) {
           continue;
         }
         
-        // Check if this is the header row
-        if (firstCell === 'Medication' || firstCell.toLowerCase().includes('medication')) {
+        const patientGoalMatch = PATIENT_GOALS.find(goal => firstCell.includes(goal));
+        if (patientGoalMatch) {
+          currentCategory = patientGoalMatch;
+          continue;
+        }
+        
+        if (firstCell.toLowerCase().includes('standard add on')) {
+          if (currentCategory && currentCategory.includes('Men')) {
+            currentCategory = 'Men - Standard Add On';
+          } else if (currentCategory && currentCategory.includes('Women')) {
+            currentCategory = 'Women - Standard Add On';
+          }
+          continue;
+        }
+        
+        const categoryKeywords = ['Joint Pain', 'Sexual Function', 'Vitamins', 'Hair Loss', 
+                                 'Improve Energy', 'Anti-Aging', 'Improve Sleep', 'Weight Loss'];
+        let foundCategory = false;
+        for (const keyword of categoryKeywords) {
+          if (firstCell.includes(keyword)) {
+            currentCategory = PATIENT_GOALS.find(goal => goal.includes(keyword)) || keyword;
+            foundCategory = true;
+            break;
+          }
+        }
+        if (foundCategory) continue;
+        
+        if (firstCell === 'Medication' || firstCell.toLowerCase() === 'medication') {
+          headerFound = true;
           headerIndices = {
             medication: 0,
             syringes: row.findIndex(h => h && h.toLowerCase().includes('syringe')),
@@ -437,39 +475,58 @@
           continue;
         }
         
-        // Skip if we don't have a category yet
-        if (!currentCategory || !headerIndices) continue;
+        if (isCA && !headerIndices && i > 2) {
+          headerIndices = {
+            medication: 0,
+            syringes: 1,
+            delivery: 2,
+            strength: 3,
+            quantity: 4,
+            price: 5,
+            duration: 6,
+            pharmacy: 7,
+            remarksDosing: 8,
+            description: 9
+          };
+        }
         
-        // Skip notes and empty rows
+        if (!headerIndices) continue;
+        
         if (firstCell.toLowerCase().includes('note') || 
-            firstCell.toLowerCase().includes('standard add on') ||
-            firstCell === '$100 CONSULT FEE' ||
-            row.filter(cell => cell).length < 2) {
+            firstCell.toLowerCase().includes('consult fee') ||
+            firstCell === '' ||
+            row.filter(cell => cell && cell.trim()).length < 2) {
           continue;
         }
         
-        // Parse medication
-        if (firstCell && firstCell.trim()) {
+        if (firstCell && firstCell.trim() && headerIndices) {
+          const medCategory = currentCategory || (isCA ? 'Men - Standard TRT Protocol' : 'Uncategorized');
+          
           const med = {
-            category: currentCategory,
+            category: medCategory,
             medication: firstCell.trim(),
-            syringes: headerIndices.syringes >= 0 ? String(row[headerIndices.syringes] || '') : '',
-            delivery: headerIndices.delivery >= 0 ? String(row[headerIndices.delivery] || '') : '',
-            strength: headerIndices.strength >= 0 ? String(row[headerIndices.strength] || '') : '',
-            quantity: headerIndices.quantity >= 0 ? String(row[headerIndices.quantity] || '') : '',
-            price: headerIndices.price >= 0 ? String(row[headerIndices.price] || '') : '',
-            duration: headerIndices.duration >= 0 ? String(row[headerIndices.duration] || '') : '',
-            pharmacy: headerIndices.pharmacy >= 0 ? String(row[headerIndices.pharmacy] || '') : '',
-            remarksDosing: headerIndices.remarksDosing >= 0 ? String(row[headerIndices.remarksDosing] || '') : '',
-            description: headerIndices.description >= 0 ? String(row[headerIndices.description] || '') : getMedicationDescription(firstCell.trim()),
+            syringes: headerIndices.syringes >= 0 && row[headerIndices.syringes] ? String(row[headerIndices.syringes]) : '',
+            delivery: headerIndices.delivery >= 0 && row[headerIndices.delivery] ? String(row[headerIndices.delivery]) : '',
+            strength: headerIndices.strength >= 0 && row[headerIndices.strength] ? String(row[headerIndices.strength]) : '',
+            quantity: headerIndices.quantity >= 0 && row[headerIndices.quantity] ? String(row[headerIndices.quantity]) : '',
+            price: headerIndices.price >= 0 && row[headerIndices.price] ? String(row[headerIndices.price]) : '',
+            duration: headerIndices.duration >= 0 && row[headerIndices.duration] ? String(row[headerIndices.duration]) : '',
+            pharmacy: headerIndices.pharmacy >= 0 && row[headerIndices.pharmacy] ? String(row[headerIndices.pharmacy]) : '',
+            remarksDosing: headerIndices.remarksDosing >= 0 && row[headerIndices.remarksDosing] ? String(row[headerIndices.remarksDosing]) : '',
+            description: '',
             isCA: isCA
           };
           
+          if (headerIndices.description >= 0 && headerIndices.description < row.length && row[headerIndices.description]) {
+            med.description = String(row[headerIndices.description]);
+          }
           if (!med.description || med.description === 'null' || med.description === '') {
             med.description = getMedicationDescription(med.medication);
           }
           
-          meds.push(med);
+          if (med.medication && !med.medication.toLowerCase().includes('note')) {
+            meds.push(med);
+          }
         }
       }
       
@@ -478,6 +535,14 @@
 
     // Filter medications
     function filterMedications(state, goal) {
+      if (state === 'California' && caMedications.length === 0) {
+        return [];
+      }
+      
+      if (state !== 'California' && medications.length === 0) {
+        return [];
+      }
+      
       const medList = state === 'California' ? caMedications : medications;
       
       let filtered = medList.filter(med => med.category === goal);
@@ -565,10 +630,58 @@
       `).join('');
     }
 
+    // Load CSV file from URL
+    async function loadCSV(url) {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const text = await response.text();
+        return text;
+      } catch (error) {
+        console.error(`Error loading ${url}:`, error);
+        throw error;
+      }
+    }
+
     // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-      const vikingFile = document.getElementById('viking-file');
-      const caFile = document.getElementById('ca-file');
+    async function init() {
+      const loadingSection = document.getElementById('loading-section');
+      const errorSection = document.getElementById('error-section');
+      const lookupSection = document.getElementById('lookup-section');
+      const errorMessage = document.getElementById('error-message');
+      
+      try {
+        // Load Viking medications
+        console.log('Loading Viking medications...');
+        const vikingText = await loadCSV(FILE_URLS.viking);
+        medications = parseMedications(vikingText, false);
+        console.log(`Loaded ${medications.length} Viking medications`);
+        
+        // Load CA medications
+        console.log('Loading CA medications...');
+        const caText = await loadCSV(FILE_URLS.ca);
+        caMedications = parseMedications(caText, true);
+        console.log(`Loaded ${caMedications.length} CA medications`);
+        
+        // Show lookup section
+        loadingSection.classList.add('hidden');
+        lookupSection.classList.remove('hidden');
+        
+        // Set up UI
+        setupUI();
+        
+      } catch (error) {
+        console.error('Error loading data:', error);
+        loadingSection.classList.add('hidden');
+        errorSection.classList.remove('hidden');
+        errorMessage.textContent = error.message;
+      }
+    }
+
+    // Set up UI elements
+    function setupUI() {
       const stateSelect = document.getElementById('state-select');
       const goalSelect = document.getElementById('goal-select');
       
@@ -587,39 +700,6 @@
         option.textContent = goal;
         goalSelect.appendChild(option);
       });
-      
-      // File uploads
-      vikingFile.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function(event) {
-            medications = parseMedications(event.target.result, false);
-            checkDataLoaded();
-          };
-          reader.readAsText(file);
-        }
-      });
-      
-      caFile.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function(event) {
-            caMedications = parseMedications(event.target.result, true);
-            checkDataLoaded();
-          };
-          reader.readAsText(file);
-        }
-      });
-      
-      // Check if both files loaded
-      function checkDataLoaded() {
-        if (medications.length > 0 && caMedications.length > 0) {
-          document.getElementById('upload-section').classList.add('hidden');
-          document.getElementById('lookup-section').classList.remove('hidden');
-        }
-      }
       
       // State selection
       stateSelect.addEventListener('change', function() {
@@ -652,7 +732,10 @@
           displayMedications(filtered, state, goal);
         }
       });
-    });
+    }
+
+    // Start the app
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
