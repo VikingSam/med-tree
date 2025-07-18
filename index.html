@@ -2157,7 +2157,7 @@
           const goalSelect = document.getElementById('goal-select');
           
           // Populate states
-          STATES.forEach(state => {
+          Object.keys(STATE_CONFIGS).sort().forEach(state => {
             const option = document.createElement('option');
             option.value = state;
             option.textContent = state;
@@ -2165,7 +2165,7 @@
           });
           
           // Populate goals
-          PATIENT_GOALS.forEach(goal => {
+          ['Men - Standard TRT Protocol', 'Men - Standard Add On', 'Women - Standard HRT Protocol', 'Women - Standard Add On', 'Joint Pain/Healing', 'Sexual Function', 'Vitamins', 'Hair Loss', 'Improve Energy', 'Anti-Aging', 'Improve Sleep', 'Weight Loss'].forEach(goal => {
             const option = document.createElement('option');
             option.value = goal;
             option.textContent = goal;
@@ -2192,31 +2192,17 @@
         }
 
         function handleSearch() {
-          const state = document.getElementById('state-select').value;
-          const goal = document.getElementById('goal-select').value;
-          
-          if (!state || !goal) return;
+  const state = document.getElementById('state-select').value;
+  const goal = document.getElementById('goal-select').value;
+  
+  if (!state || !goal) return;
           
           // Use California medications for CA, regular medications for all other states
           const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
           
           // Filter by category first
           let filteredMedications = medList.filter(med => med.category === goal);
-          
-          // Then filter by pharmacy shipping restrictions
-          const allowedPharmacies = STATE_CONFIGS[state]?.pharmacies || [];
-          filteredMedications = filteredMedications.filter(med => {
-            // If medication has 'ALL' pharmacy, it's available everywhere
-            if (med.pharmacy === 'ALL' || med.pharmacy === '') {
-              return true;
-            }
             
-            // Check if any of the allowed pharmacies match the medication's pharmacy
-            return allowedPharmacies.some(pharmacy => 
-              med.pharmacy.includes(pharmacy) || pharmacy === 'ALL'
-            );
-          });
-          
           displayResults(filteredMedications, state, goal);
         }
 
