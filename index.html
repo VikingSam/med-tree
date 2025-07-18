@@ -142,7 +142,7 @@
       <h1>Medication Lookup</h1>
       
       <div id="data-status" class="alert">
-        <p><strong>Status:</strong> Using Viking medication data. <span id="med-count"></span></p>
+        <p><strong>Status:</strong> <span id="med-count">Select a state and patient goal to view available medications</span></p>
       </div>
       
       <div class="grid">
@@ -2536,15 +2536,22 @@
       const noResults = document.getElementById('no-results');
       const header = document.getElementById('results-header');
       const list = document.getElementById('medications-list');
+      const dataStatus = document.getElementById('data-status');
+      const medCount = document.getElementById('med-count');
       
       if (meds.length === 0) {
         resultsSection.classList.add('hidden');
         noResults.classList.remove('hidden');
+        // Update status for no results
+        medCount.textContent = `No medications found in ${state} for ${goal}`;
         return;
       }
       
       noResults.classList.add('hidden');
       resultsSection.classList.remove('hidden');
+      
+      // Update status to show current filtered results
+      medCount.textContent = `Now Viewing ${meds.length} Medication${meds.length === 1 ? '' : 's'} in the State of ${state} related to ${goal}`;
       
       header.textContent = `Available Medications for ${goal} in ${state}`;
       
@@ -2591,9 +2598,7 @@
       const goalSelect = document.getElementById('goal-select');
       const medCount = document.getElementById('med-count');
       
-      // Update status
-      const totalMeds = medications.length + caMedications.length;
-      medCount.textContent = `${totalMeds} medications loaded (${medications.length} regular, ${caMedications.length} CA)`;
+      // Status starts with instruction message - will update when selections are made
       
       // Populate states
       STATES.forEach(state => {
@@ -2625,6 +2630,8 @@
           document.getElementById('select-goal-message').classList.add('hidden');
           document.getElementById('results-section').classList.add('hidden');
           document.getElementById('no-results').classList.add('hidden');
+          // Reset status message when no state selected
+          medCount.textContent = 'Select a state and patient goal to view available medications';
         }
         
         if (state && goalSelect.value) {
