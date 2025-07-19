@@ -463,6 +463,7 @@
 
     function init() {
         console.log('Initializing app...');
+      
         
         const stateSelect = document.getElementById('state-select');
         const goalSelect = document.getElementById('goal-select');
@@ -507,10 +508,16 @@
         }
     }
 
-    function handleSearch() {
+      function handleSearch() {
         const state = document.getElementById('state-select').value;
         const goal = document.getElementById('goal-select').value;
-        
+    
+      // Hide splash image when both state and goal are selected
+        const splashImage = document.getElementById('splash-image');
+        if (state && goal && splashImage) {
+        splashImage.classList.add('hidden');       
+    }
+    
         if (!state || !goal) return;
                 
         // Use California medications for CA, regular medications for all other states
