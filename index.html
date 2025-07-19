@@ -352,8 +352,9 @@
     let currentGoal = '';
 
     // EmailJS configuration
-    const EMAIL_SERVICE_ID = 'YOUR_SERVICE_ID_HERE'; // Replace with your actual service ID
-    const EMAIL_TEMPLATE_ID = 'medication_interest';
+  const EMAIL_SERVICE_ID = 'service_3foq4ae'; // Replace with your service ID
+  const EMAIL_TEMPLATE_ID = 'medication_interest';
+  
 
     // Configuration
     const STATE_CONFIGS = {
@@ -2892,10 +2893,7 @@
   if (dataStatus) dataStatus.classList.add('hidden');
 }
 
-  // EmailJS configuration
-  const EMAIL_SERVICE_ID = 'service_3foq4ae'; // Replace with your service ID
-  const EMAIL_TEMPLATE_ID = 'medication_interest';
-  
+ 
   function handleSearch() {
     const state = document.getElementById('state-select').value;
     const goal = document.getElementById('goal-select').value;
