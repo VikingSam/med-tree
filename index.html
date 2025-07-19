@@ -668,7 +668,19 @@
                 remarksDosing: '',
                 description: 'Pregnenolone is a steroid hormone precursor that can be converted into various hormones including DHEA, progesterone, testosterone, and estrogen. Often called the "mother hormone," it is used to support overall hormone balance, cognitive function, and well-being. What you can expect: Potential improvements in memory, mood, energy levels, and overall sense of well-being. May help with stress management and cognitive clarity. Effects typically develop gradually over 4-8 weeks of consistent use. Common side effects: Generally well-tolerated. May cause mild headaches, acne, hair growth changes, or mood alterations in some individuals. Higher doses may cause more pronounced hormonal effects. Known interactions: May interact with hormone-sensitive medications, blood thinners, and drugs that affect liver enzymes. Can potentially enhance or interfere with other hormone therapies. Should be used cautiously with psychiatric medications and seizure medications. **This information is automatically generated with AI. Use this information as a guideline only because AI is capable of making mistakes. Always seek the guidance of your medical provider before starting or stopping the use of any medication.**'
             },
-            
+          {
+                category: 'Men - Standard Add On',
+                medication: 'HCG - lyophilized (Powder)',
+                syringes: '#20 Insulin syringes',
+                delivery: 'Injectable',
+                strength: '5000iu',
+                quantity: '1 vial',
+                price: '$150.00',
+                duration: '10 weeks',
+                pharmacy: 'Riteaway / Revive',
+                remarksDosing: 'Inject 25 units...',
+                description: 'Human Chorionic Gonadotropin...'
+            },            
             // Women - Standard HRT Protocol
             {
                 category: 'Women - Standard HRT Protocol',
@@ -1932,58 +1944,59 @@
 
     // STATE CONFIGURATIONS - Define which pharmacies ship to which states
     const STATE_CONFIGS = {
-        'Alabama': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Alaska': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Arizona': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Arkansas': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'California': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Colorado': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Connecticut': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Delaware': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Florida': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Georgia': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Hawaii': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Idaho': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Illinois': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Indiana': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Iowa': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Kansas': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Kentucky': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Louisiana': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Maine': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Maryland': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Massachusetts': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Michigan': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Minnesota': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Mississippi': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Missouri': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Montana': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Nebraska': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Nevada': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'New Hampshire': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'New Jersey': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'New Mexico': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'New York': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'North Carolina': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'North Dakota': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Ohio': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Oklahoma': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Oregon': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Pennsylvania': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Puerto Rico': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Rhode Island': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'South Carolina': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'South Dakota': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Tennessee': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Texas': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Utah': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Vermont': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Virginia': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Washington': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'West Virginia': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Wisconsin': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] },
-        'Wyoming': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] }
-    };
+    'Alabama': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Alaska': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Arizona': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Arkansas': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'California': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Colorado': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Connecticut': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Delaware': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Florida': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Georgia': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Hawaii': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Idaho': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Illinois': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Indiana': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Iowa': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Kansas': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Kentucky': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Louisiana': { pharmacies: ['Hallandale', '1st Choice', 'ALL'] }, // NO RITEAWAY/REVIVE FOR LOUISIANA
+    'Maine': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Maryland': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Massachusetts': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Michigan': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Minnesota': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Mississippi': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Missouri': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Montana': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Nebraska': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Nevada': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'New Hampshire': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'New Jersey': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'New Mexico': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'New York': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'North Carolina': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'North Dakota': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Ohio': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Oklahoma': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Oregon': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Pennsylvania': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Puerto Rico': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Rhode Island': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'South Carolina': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'South Dakota': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Tennessee': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Texas': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Utah': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Vermont': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Virginia': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Washington': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'West Virginia': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Wisconsin': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] },
+    'Wyoming': { pharmacies: ['Hallandale', '1st Choice', 'Riteaway', 'Revive', 'ALL'] }
+};
+
 
     // Data constants - Simple arrays like the working code
     const STATES = [
@@ -2067,20 +2080,38 @@
   if (dataStatus) dataStatus.classList.add('hidden');
 }
 
-    function handleSearch() {
-      const state = document.getElementById('state-select').value;
-      const goal = document.getElementById('goal-select').value;
+   function handleSearch() {
+  const state = document.getElementById('state-select').value;
+  const goal = document.getElementById('goal-select').value;
+  
+  if (!state || !goal) return;
+          
+  // Use California medications for CA, regular medications for all other states
+  const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
+  
+  // Filter by category first
+  let filteredMedications = medList.filter(med => med.category === goal);
+  
+  // ADD THIS SECTION HERE ↓↓↓
+  // NOW FILTER BY PHARMACY RESTRICTIONS
+  const allowedPharmacies = STATE_CONFIGS[state]?.pharmacies || [];
+  
+  filteredMedications = filteredMedications.filter(med => {
+      // If pharmacy is empty, blank, or "ALL", it's available everywhere
+      if (!med.pharmacy || med.pharmacy === '' || med.pharmacy === 'ALL') {
+          return true;
+      }
       
-      if (!state || !goal) return;
-              
-      // Use California medications for CA, regular medications for all other states
-      const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
-      
-      // Filter by category first
-      let filteredMedications = medList.filter(med => med.category === goal);
-        
-      displayResults(filteredMedications, state, goal);
-    }
+      // Check if this medication's pharmacy ships to this state
+      const medPharmacies = med.pharmacy.split(' / ').map(p => p.trim());
+      return medPharmacies.some(pharmacy => 
+          allowedPharmacies.includes(pharmacy) || allowedPharmacies.includes('ALL')
+      );
+  });
+  // ADD THIS SECTION HERE ↑↑↑
+    
+  displayResults(filteredMedications, state, goal);
+}
 
     function displayResults(medications, state, goal) {
         const resultsSection = document.getElementById('results-section');
