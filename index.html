@@ -511,16 +511,22 @@
     }
 
       function handleSearch() {
-        const state = document.getElementById('state-select').value;
-        const goal = document.getElementById('goal-select').value;
+    const state = document.getElementById('state-select').value;
+    const goal = document.getElementById('goal-select').value;
+
+    const splashImage = document.getElementById('splash-image');
     
-      // Hide splash image when both state and goal are selected
-        const splashImage = document.getElementById('splash-image');
-        if (state && goal && splashImage) {
+    if (state && goal && splashImage) {
+        // Hide when BOTH selected
         splashImage.classList.add('hidden');       
+    } else if (splashImage) {
+        // Show when either is missing
+        splashImage.classList.remove('hidden');
     }
     
-        if (!state || !goal) return;
+    if (!state || !goal) return;
+    // ... rest of your filtering code
+}
                 
         // Use California medications for CA, regular medications for all other states
         const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
