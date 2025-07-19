@@ -503,10 +503,17 @@
     }
 }
 
-      function handleSearch() {
+function handleSearch() {
+    // splash image logic
+    if (!state || !goal) return;
+}  // ← Function ends HERE but shouldn't!
+
+// This code is OUTSIDE the function - causes the error!
+const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
+Fix it by putting ALL the medication logic INSIDE handleSearch. Replace your entire handleSearch function with:
+javascriptfunction handleSearch() {
     const state = document.getElementById('state-select').value;
     const goal = document.getElementById('goal-select').value;
-
     const splashImage = document.getElementById('splash-image');
     
     if (state && goal && splashImage) {
@@ -518,33 +525,31 @@
     }
     
     if (!state || !goal) return;
-    // ... rest of your filtering code
+    
+    // Use California medications for CA, regular medications for all other states
+    const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
+    
+    // Filter by category first
+    let filteredMedications = medList.filter(med => med.category === goal);
+    
+    // NOW FILTER BY PHARMACY RESTRICTIONS
+    const allowedPharmacies = STATE_CONFIGS[state]?.pharmacies || [];
+    
+    filteredMedications = filteredMedications.filter(med => {
+        // If pharmacy is empty, blank, or "ALL", it's available everywhere
+        if (!med.pharmacy || med.pharmacy === '' || med.pharmacy === 'ALL') {
+            return true;
+        }
+        
+        // Check if this medication's pharmacy ships to this state
+        const medPharmacies = med.pharmacy.split(' / ').map(p => p.trim());
+        return medPharmacies.some(pharmacy => 
+            allowedPharmacies.includes(pharmacy)
+        );
+    });
+      
+    displayResults(filteredMedications, state, goal);
 }
-                
-        // Use California medications for CA, regular medications for all other states
-        const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
-        
-        // Filter by category first
-        let filteredMedications = medList.filter(med => med.category === goal);
-        
-        // NOW FILTER BY PHARMACY RESTRICTIONS
-        const allowedPharmacies = STATE_CONFIGS[state]?.pharmacies || [];
-        
-        filteredMedications = filteredMedications.filter(med => {
-            // If pharmacy is empty, blank, or "ALL", it's available everywhere
-            if (!med.pharmacy || med.pharmacy === '' || med.pharmacy === 'ALL') {
-                return true;
-            }
-            
-            // Check if this medication's pharmacy ships to this state
-            const medPharmacies = med.pharmacy.split(' / ').map(p => p.trim());
-            return medPharmacies.some(pharmacy => 
-                allowedPharmacies.includes(pharmacy)
-            );
-        });
-          
-        displayResults(filteredMedications, state, goal);
-    }
 
     function displayResults(medications, state, goal) {
         const resultsSection = document.getElementById('results-section');
