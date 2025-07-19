@@ -497,10 +497,15 @@
         
         goalSelect.addEventListener('change', handleSearch);
         
-        console.log('App initialized successfully');
-    } else {
-        console.error('Required elements not found');
+       console.log('App initialized successfully');
+    
+    // Ensure splash image is visible on page load
+    const splashImage = document.getElementById('splash-image');
+    if (splashImage) {
+        splashImage.classList.remove('hidden');
     }
+} else {
+    console.error('Required elements not found');
 }
 
 function handleSearch() {
