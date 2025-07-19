@@ -487,19 +487,28 @@
             
             // Event listeners
             stateSelect.addEventListener('change', function() {
-                if (this.value) {
-                    goalSelect.disabled = false;
-                    const splashImage = document.getElementById('splash-image');
-                    if (splashImage) splashImage.classList.add('hidden');
-                } else {
-                    goalSelect.disabled = true;
-                    goalSelect.value = '';
-                    const splashImage = document.getElementById('splash-image');
-                    if (splashImage) splashImage.classList.remove('hidden');
-                }
-                handleSearch();
-            });
-            
+            console.log('State changed to:', this.value);
+            const splashImage = document.getElementById('splash-image');
+            console.log('Splash image element found:', splashImage);
+    
+    if (this.value) {
+        goalSelect.disabled = false;
+        if (splashImage) {
+            console.log('Adding hidden class to splash image');
+            splashImage.classList.add('hidden');
+            console.log('Splash image classes:', splashImage.className);
+        } else {
+            console.log('ERROR: Splash image element not found!');
+        }
+    } else {
+        goalSelect.disabled = true;
+        goalSelect.value = '';
+        if (splashImage) {
+            splashImage.classList.remove('hidden');
+        }
+    }
+    handleSearch();
+});
             goalSelect.addEventListener('change', handleSearch);
             
             console.log('App initialized successfully');
