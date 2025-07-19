@@ -2739,7 +2739,17 @@
       );
   });
     
-  displayResults(filteredMedications, state, goal);
+  // ADD THIS DEBUG BLOCK HERE ↓↓↓
+if (state === 'California') {
+    console.log('=== PHARMACY FILTER DEBUG ===');
+    console.log('STATE_CONFIGS for CA:', STATE_CONFIGS['California']);
+    console.log('Allowed pharmacies:', allowedPharmacies);
+    console.log('After pharmacy filter:', filteredMedications.length);
+    console.log('Final medications:', filteredMedications.map(med => `${med.medication} - Pharmacy: ${med.pharmacy}`));
+}
+// ADD THIS DEBUG BLOCK HERE ↑↑↑
+     
+     displayResults(filteredMedications, state, goal);
 }
     function displayResults(medications, state, goal) {
         const resultsSection = document.getElementById('results-section');
