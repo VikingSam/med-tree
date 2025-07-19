@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  //Email JavaScript Settings
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script type="text/javascript">
+    emailjs.init('YOUR_PUBLIC_KEY_HERE'); // Replace with your actual public key
+  </script>
+  // End JavaScript Settings
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Medication Lookup App</title>
@@ -2484,8 +2490,16 @@
   if (selectGoalMessage) selectGoalMessage.classList.remove('hidden');
   if (dataStatus) dataStatus.classList.add('hidden');
 }
+  // Medication selection tracking
+  let selectedMedications = [];
+  let currentState = '';
+  let currentGoal = '';
 
-   function handleSearch() {
+  // EmailJS configuration
+  const EMAIL_SERVICE_ID = 'service_3foq4ae'; // Replace with your service ID
+  const EMAIL_TEMPLATE_ID = 'medication_interest';
+  
+  function handleSearch() {
   const state = document.getElementById('state-select').value;
   const goal = document.getElementById('goal-select').value;
   
