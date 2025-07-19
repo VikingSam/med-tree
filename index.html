@@ -2042,16 +2042,30 @@
     }
 
     function handleStateChange() {
-      const stateSelect = document.getElementById('state-select');
-      const goalSelect = document.getElementById('goal-select');
-      
-      if (stateSelect.value) {
-        goalSelect.disabled = false;
-      } else {
-        goalSelect.disabled = true;
-        goalSelect.value = '';
-      }
-    }
+  const stateSelect = document.getElementById('state-select');
+  const goalSelect = document.getElementById('goal-select');
+  
+  if (stateSelect.value) {
+    goalSelect.disabled = false;
+    // RESET THE GOAL DROPDOWN TO EMPTY/DEFAULT
+    goalSelect.value = '';
+  } else {
+    goalSelect.disabled = true;
+    goalSelect.value = '';
+  }
+  
+  // CLEAR ANY EXISTING RESULTS WHEN STATE CHANGES
+  const resultsSection = document.getElementById('results-section');
+  const noResultsSection = document.getElementById('no-results');
+  const selectGoalMessage = document.getElementById('select-goal-message');
+  const dataStatus = document.getElementById('data-status');
+  
+  // Hide results and show "select goal" message
+  if (resultsSection) resultsSection.classList.add('hidden');
+  if (noResultsSection) noResultsSection.classList.add('hidden');
+  if (selectGoalMessage) selectGoalMessage.classList.remove('hidden');
+  if (dataStatus) dataStatus.classList.add('hidden');
+}
 
     function handleSearch() {
       const state = document.getElementById('state-select').value;
