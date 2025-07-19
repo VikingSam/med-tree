@@ -492,34 +492,43 @@
                 goalSelect.disabled = true;
                 goalSelect.value = '';
             }
+            
+            // Simple splash image logic
+            const splashImage = document.getElementById('splash-image');
+            if (splashImage) {
+                if (this.value && goalSelect.value) {
+                    splashImage.classList.add('hidden');
+                } else {
+                    splashImage.classList.remove('hidden');
+                }
+            }
+            
             handleSearch();
         });
         
-        goalSelect.addEventListener('change', handleSearch);
+        goalSelect.addEventListener('change', function() {
+            // Simple splash image logic
+            const splashImage = document.getElementById('splash-image');
+            if (splashImage) {
+                if (stateSelect.value && this.value) {
+                    splashImage.classList.add('hidden');
+                } else {
+                    splashImage.classList.remove('hidden');
+                }
+            }
+            
+            handleSearch();
+        });
         
-       console.log('App initialized successfully');
-    
-    // Ensure splash image is visible on page load
-    const splashImage = document.getElementById('splash-image');
-    if (splashImage) {
-        splashImage.classList.remove('hidden');
+        console.log('App initialized successfully');
+    } else {
+        console.error('Required elements not found');
     }
-} else {
-    console.error('Required elements not found');
 }
 
 function handleSearch() {
     const state = document.getElementById('state-select').value;
     const goal = document.getElementById('goal-select').value;
-    const splashImage = document.getElementById('splash-image');
-    
-    if (state && goal && splashImage) {
-        // Hide when BOTH selected
-        splashImage.classList.add('hidden');       
-    } else if (splashImage) {
-        // Show when either is missing
-        splashImage.classList.remove('hidden');
-    }
     
     if (!state || !goal) return;
     
