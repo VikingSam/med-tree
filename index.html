@@ -2704,10 +2704,25 @@
   // Use California medications for CA, regular medications for all other states
   const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
   
+  // ADD FIRST DEBUG BLOCK HERE ↓↓↓
+  if (state === 'California') {
+      console.log('=== CALIFORNIA DEBUG ===');
+      console.log('CA_MEDICATIONS length:', CA_MEDICATIONS.length);
+      console.log('Selected goal:', goal);
+      console.log('CA categories available:', [...new Set(CA_MEDICATIONS.map(med => med.category))]);
+  }
+  // ADD FIRST DEBUG BLOCK HERE ↑↑↑
+  
   // Filter by category first
   let filteredMedications = medList.filter(med => med.category === goal);
   
-  // ADD THIS SECTION HERE ↓↓↓
+  // ADD SECOND DEBUG BLOCK HERE ↓↓↓
+  if (state === 'California') {
+      console.log('After category filter:', filteredMedications.length);
+      console.log('Filtered medications:', filteredMedications.map(med => med.medication));
+  }
+  // ADD SECOND DEBUG BLOCK HERE ↑↑↑
+  
   // NOW FILTER BY PHARMACY RESTRICTIONS
   const allowedPharmacies = STATE_CONFIGS[state]?.pharmacies || [];
   
@@ -2723,11 +2738,9 @@
           allowedPharmacies.includes(pharmacy)
       );
   });
-  // ADD THIS SECTION HERE ↑↑↑
     
   displayResults(filteredMedications, state, goal);
 }
-
     function displayResults(medications, state, goal) {
         const resultsSection = document.getElementById('results-section');
         const noResultsSection = document.getElementById('no-results');
