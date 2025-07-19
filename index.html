@@ -2105,7 +2105,7 @@
       // Check if this medication's pharmacy ships to this state
       const medPharmacies = med.pharmacy.split(' / ').map(p => p.trim());
       return medPharmacies.some(pharmacy => 
-          allowedPharmacies.includes(pharmacy) || allowedPharmacies.includes('ALL')
+          allowedPharmacies.includes(pharmacy)
       );
   });
   // ADD THIS SECTION HERE ↑↑↑
