@@ -1,5 +1,3 @@
-Viking Medicine Tree Index.html as of 1:34 pm on 07/18/25
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2205,22 +2203,7 @@ Viking Medicine Tree Index.html as of 1:34 pm on 07/18/25
           // Filter by category first
           let filteredMedications = medList.filter(med => med.category === goal);
           
-          // Then filter by pharmacy shipping restrictions
-          const allowedPharmacies = STATE_CONFIGS[state]?.pharmacies || [];
-          filteredMedications = filteredMedications.filter(med => {
-            // If medication has 'ALL' pharmacy, it's available everywhere
-            if (med.pharmacy === 'ALL' || med.pharmacy === '') {
-              return true;
-            }
-            
-            // Check if any of the allowed pharmacies match the medication's pharmacy
-            return allowedPharmacies.some(pharmacy => 
-              med.pharmacy.includes(pharmacy) || pharmacy === 'ALL'
-            );
-          });
-          
-          displayResults(filteredMedications, state, goal);
-        }
+          }
 
         function displayResults(medications, state, goal) {
             const resultsSection = document.getElementById('results-section');
