@@ -504,14 +504,6 @@
 }
 
 function handleSearch() {
-    // splash image logic
-    if (!state || !goal) return;
-}  // ← Function ends HERE but shouldn't!
-
-// This code is OUTSIDE the function - causes the error!
-const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
-Fix it by putting ALL the medication logic INSIDE handleSearch. Replace your entire handleSearch function with:
-javascriptfunction handleSearch() {
     const state = document.getElementById('state-select').value;
     const goal = document.getElementById('goal-select').value;
     const splashImage = document.getElementById('splash-image');
