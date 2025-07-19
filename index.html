@@ -486,28 +486,21 @@
             });
             
             stateSelect.addEventListener('change', function() {
-                console.log('State changed to:', this.value);
-                const splashImage = document.getElementById('splash-image');
-                console.log('Splash image element found:', splashImage);
-        
-                if (this.value) {
-                    goalSelect.disabled = false;
-                    if (splashImage) {
-                        console.log('Adding hidden class to splash image');
-                        splashImage.classList.add('hidden');
-                        console.log('Splash image classes:', splashImage.className);
-                    } else {
-                        console.log('ERROR: Splash image element not found!');
-                    }
-                } else {
-                    goalSelect.disabled = true;
-                    goalSelect.value = '';
-                    if (splashImage) {
-                        splashImage.classList.remove('hidden');
-                    }
-                }
-                handleSearch();
-            });
+    console.log('State changed to:', this.value);
+    
+    if (this.value) {
+        goalSelect.disabled = false;
+    } else {
+        goalSelect.disabled = true;
+        goalSelect.value = '';
+        // Show splash image when no state selected
+        const splashImage = document.getElementById('splash-image');
+        if (splashImage) {
+            splashImage.classList.remove('hidden');
+        }
+    }
+    handleSearch();
+});
             
             goalSelect.addEventListener('change', handleSearch);
             
