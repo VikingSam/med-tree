@@ -727,7 +727,7 @@ function handleSearch() {
         // Create form
         modal.innerHTML = `
             <div style="background: white; padding: 30px; border-radius: 10px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;">
-                <h2 style="margin-top: 0; color: #333;">Submit Medication Interest</h2>
+                <h2 style="margin-top: 0; color: #333;">Submit Medication Interest(s)</h2>
                 
                 <div style="margin-bottom: 20px;">
                     <h3 style="color: #555; margin-bottom: 10px;">Selected Medications (${selectedMedications.length}):</h3>
@@ -818,7 +818,7 @@ function handleSearch() {
         // Send email via EmailJS
         emailjs.send(EMAIL_SERVICE_ID, EMAIL_TEMPLATE_ID, emailData)
             .then(function(response) {
-                alert('Thank you! Your interest has been submitted successfully. We will contact you soon.');
+                alert('Thank you! Your selection(s) have been submitted! We will contact you soon.');
                 closeSubmissionForm();
                 clearSelections();
             })
