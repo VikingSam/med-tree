@@ -599,28 +599,23 @@
     if (noResultsSection) noResultsSection.classList.add('hidden');
     
     if (dataStatus && medCount) {
-        dataStatus.classList.remove('hidden');
-        medCount.textContent = `Found ${medications.length} medication${medications.length === 1 ? '' : 's'} for ${goal} in ${state}`;
-    }
-    
-    // Show evaluation message when medications are displayed
-    const evaluationMessage = document.getElementById('evaluation-message');
-    if (evaluationMessage) {
-        if (medications.length > 0) {
-            evaluationMessage.classList.remove('hidden');
-        } else {
-            evaluationMessage.classList.add('hidden');
+            dataStatus.classList.remove('hidden');
+            medCount.textContent = `Found ${medications.length} medication${medications.length === 1 ? '' : 's'} for ${goal} in ${state}`;
         }
-    }
+        
+        // Show evaluation message when medications are displayed
+        const evaluationMessage = document.getElementById('evaluation-message');
+        if (evaluationMessage && medications.length > 0) {
+            evaluationMessage.classList.remove('hidden');
+            evaluationMessage.style.display = 'block';
+        }
+        
+        // Get medications container
+        const medicationsContainer = document.getElementById('medications-list');
+      
+        // Clear previous results
+        medicationsContainer.innerHTML = '';
 
-    // Get medications container
-    const medicationsContainer = document.getElementById('medications-list');
-    
-    // Clear previous results
-    medicationsContainer.innerHTML = '';
-
-    // REST OF YOUR MEDICATION DISPLAY CODE CONTINUES HERE...
-    // (Add submit button, create medication cards, etc.)
 
         // Add submit button at top
         const submitButtonHtml = `
