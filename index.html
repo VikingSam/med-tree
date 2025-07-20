@@ -215,7 +215,7 @@
       margin-bottom: 1.5rem;
     }
     .hidden {
-      display: none;
+      display: none !important;
     }
     
     /* Mobile Responsiveness */
@@ -326,12 +326,12 @@
 
   <div class="main-content">
     <div class="container">
-    <div id="data-status" class="alert hidden">
-       <p><strong>Status:</strong> <span id="med-count">Select a state and patient goal to view available medications</span></p>
-       <p id="evaluation-message" style="margin-top: 10px; font-size: 0.9rem; color: #555; font-weight: bold;" class="hidden">
-        If you'd like to learn more about any of the options listed, check the box next to the medication(s) and submit for evaluation by our medical team. If additional information is required, you will be contacted by our staff.
-       </p>
-    </div>
+      <div id="data-status" class="alert hidden">
+        <p><strong>Status:</strong> <span id="med-count">Select a state and patient goal to view available medications</span></p>
+        <p id="evaluation-message" style="margin-top: 10px; font-size: 0.9rem; color: #555; font-weight: bold;">
+          If you'd like to learn more about any of the options listed, check the box next to the medication(s) and submit for evaluation by our medical team. If additional information is required, you will be contacted by our staff.
+        </p>
+      </div>
   
       <p id="select-goal-message" class="text-muted hidden">Please select a patient goal to view available medications.</p>
 
@@ -356,7 +356,7 @@
     let currentGoal = '';
 
     // EmailJS configuration
-    const EMAIL_SERVICE_ID = 'service_3foq4ae'; // Replace with your service ID
+    const EMAIL_SERVICE_ID = 'service_3foq4ae';
     const EMAIL_TEMPLATE_ID = 'medication_interest';
 
     // Configuration
@@ -470,141 +470,139 @@
     ];
 
     function init() {
-    console.log('Initializing app...');
-    
-    const stateSelect = document.getElementById('state-select');
-    const goalSelect = document.getElementById('goal-select');
-    
-    if (stateSelect && goalSelect) {
-        // Populate states
-        Object.keys(STATE_CONFIGS).sort().forEach(state => {
-            const option = document.createElement('option');
-            option.value = state;
-            option.textContent = state;
-            stateSelect.appendChild(option);
-        });
+        console.log('Initializing app...');
         
-        // Populate goals
-        PATIENT_GOALS.forEach(goal => {
-            const option = document.createElement('option');
-            option.value = goal;
-            option.textContent = goal;
-            goalSelect.appendChild(option);
-        });
+        const stateSelect = document.getElementById('state-select');
+        const goalSelect = document.getElementById('goal-select');
         
-        // Event listeners
-        stateSelect.addEventListener('change', function() {
-            if (this.value) {
-                goalSelect.disabled = false;
+        if (stateSelect && goalSelect) {
+            // Populate states
+            Object.keys(STATE_CONFIGS).sort().forEach(state => {
+                const option = document.createElement('option');
+                option.value = state;
+                option.textContent = state;
+                stateSelect.appendChild(option);
+            });
+            
+            // Populate goals
+            PATIENT_GOALS.forEach(goal => {
+                const option = document.createElement('option');
+                option.value = goal;
+                option.textContent = goal;
+                goalSelect.appendChild(option);
+            });
+            
+            // Event listeners
+            stateSelect.addEventListener('change', function() {
+                if (this.value) {
+                    goalSelect.disabled = false;
+                } else {
+                    goalSelect.disabled = true;
+                    goalSelect.value = '';
+                }
+                
+                handleSearch();
+            });
+            
+            goalSelect.addEventListener('change', function() {
+                handleSearch();
+            });
+            
+            console.log('App initialized successfully');
+        } else {
+            console.error('Required elements not found');
+        }
+    }
+
+    function handleSearch() {
+        const state = document.getElementById('state-select').value;
+        const goal = document.getElementById('goal-select').value;
+        const splashImage = document.getElementById('splash-image');
+        
+        // Handle splash image visibility
+        if (splashImage) {
+            if (state && goal) {
+                splashImage.classList.add('hidden');
             } else {
-                goalSelect.disabled = true;
-                goalSelect.value = '';
+                splashImage.classList.remove('hidden');
+            }
+        }
+        
+        if (!state || !goal) return;
+        
+        // Use California medications for CA, regular medications for all other states
+        const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
+        
+        // Filter by category first
+        let filteredMedications = medList.filter(med => med.category === goal);
+        
+        // NOW FILTER BY PHARMACY RESTRICTIONS
+        const allowedPharmacies = STATE_CONFIGS[state]?.pharmacies || [];
+        
+        filteredMedications = filteredMedications.filter(med => {
+            // If pharmacy is empty, blank, or "ALL", it's available everywhere
+            if (!med.pharmacy || med.pharmacy === '' || med.pharmacy === 'ALL') {
+                return true;
             }
             
-            handleSearch();
+            // Check if this medication's pharmacy ships to this state
+            const medPharmacies = med.pharmacy.split(' / ').map(p => p.trim());
+            return medPharmacies.some(pharmacy => 
+                allowedPharmacies.includes(pharmacy)
+            );
         });
-        
-        goalSelect.addEventListener('change', function() {
-            handleSearch();
-        });
-        
-        console.log('App initialized successfully');
-    } else {
-        console.error('Required elements not found');
+          
+        displayResults(filteredMedications, state, goal);
     }
-}
-          function handleSearch() {
-    const state = document.getElementById('state-select').value;
-    const goal = document.getElementById('goal-select').value;
-    const splashImage = document.getElementById('splash-image');
-    
-    // Handle splash image visibility
-    if (splashImage) {
-        if (state && goal) {
-            splashImage.classList.add('hidden');
-        } else {
-            splashImage.classList.remove('hidden');
-        }
-    }
-    
-    if (!state || !goal) return;
-    
-    // Use California medications for CA, regular medications for all other states
-    const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
-    
-    // Filter by category first
-    let filteredMedications = medList.filter(med => med.category === goal);
-    
-    // NOW FILTER BY PHARMACY RESTRICTIONS
-    const allowedPharmacies = STATE_CONFIGS[state]?.pharmacies || [];
-    
-    filteredMedications = filteredMedications.filter(med => {
-        // If pharmacy is empty, blank, or "ALL", it's available everywhere
-        if (!med.pharmacy || med.pharmacy === '' || med.pharmacy === 'ALL') {
-            return true;
-        }
-        
-        // Check if this medication's pharmacy ships to this state
-        const medPharmacies = med.pharmacy.split(' / ').map(p => p.trim());
-        return medPharmacies.some(pharmacy => 
-            allowedPharmacies.includes(pharmacy)
-        );
-    });
-      
-    displayResults(filteredMedications, state, goal);
-}
 
     function displayResults(medications, state, goal) {
-    const resultsSection = document.getElementById('results-section');
-    const noResultsSection = document.getElementById('no-results');
-    const dataStatus = document.getElementById('data-status');
-    const medCount = document.getElementById('med-count');
-    const selectGoalMessage = document.getElementById('select-goal-message');
-    
-    // Store current selection info
-    currentState = state;
-    currentGoal = goal;
-    
-    // Hide select goal message
-    if (selectGoalMessage) selectGoalMessage.classList.add('hidden');
-    
-    if (medications.length === 0) {
-        if (resultsSection) resultsSection.classList.add('hidden');
-        if (noResultsSection) noResultsSection.classList.remove('hidden');
-        if (dataStatus && medCount) {
-            dataStatus.classList.remove('hidden');
-            medCount.textContent = `No medications available for ${goal} in ${state}`;
-        }
-        // Hide evaluation message when no medications
+        const resultsSection = document.getElementById('results-section');
+        const noResultsSection = document.getElementById('no-results');
+        const dataStatus = document.getElementById('data-status');
+        const medCount = document.getElementById('med-count');
+        const selectGoalMessage = document.getElementById('select-goal-message');
         const evaluationMessage = document.getElementById('evaluation-message');
-        if (evaluationMessage) {
-            evaluationMessage.classList.add('hidden');
+        
+        // Store current selection info
+        currentState = state;
+        currentGoal = goal;
+        
+        // Hide select goal message
+        if (selectGoalMessage) selectGoalMessage.classList.add('hidden');
+        
+        if (medications.length === 0) {
+            if (resultsSection) resultsSection.classList.add('hidden');
+            if (noResultsSection) noResultsSection.classList.remove('hidden');
+            if (dataStatus && medCount) {
+                dataStatus.classList.remove('hidden');
+                medCount.textContent = `No medications available for ${goal} in ${state}`;
+            }
+            // Hide evaluation message when no medications
+            if (evaluationMessage) {
+                evaluationMessage.style.display = 'none';
+            }
+            return;
         }
-        return;
-    }
-    
-    // Show results section
-    if (resultsSection) resultsSection.classList.remove('hidden');
-    if (noResultsSection) noResultsSection.classList.add('hidden');
-    
-    if (dataStatus && medCount) {
+        
+        // Show results section
+        if (resultsSection) resultsSection.classList.remove('hidden');
+        if (noResultsSection) noResultsSection.classList.add('hidden');
+        
+        if (dataStatus && medCount) {
             dataStatus.classList.remove('hidden');
             medCount.textContent = `Found ${medications.length} medication${medications.length === 1 ? '' : 's'} for ${goal} in ${state}`;
         }
         
         // Show evaluation message when medications are displayed
-        const evaluationMessage = document.getElementById('evaluation-message');
         if (evaluationMessage && medications.length > 0) {
-            evaluationMessage.classList.remove('hidden');
             evaluationMessage.style.display = 'block';
         }
         
         // Get medications container
         const medicationsContainer = document.getElementById('medications-list');
-      
+        
         // Clear previous results
         medicationsContainer.innerHTML = '';
-
 
         // Add submit button at top
         const submitButtonHtml = `
