@@ -512,42 +512,34 @@
     }
 
     function handleSearch() {
-    const state = document.getElementById('state-select').value;
-    const goal = document.getElementById('goal-select').value;
-    const splashImage = document.getElementById('splash-image');
-    
-    // Simple: if both have values, hide. Otherwise, show.
-    if (state !== '' && goal !== '') {
-        splashImage.style.display = 'none';
-    } else {
-        splashImage.style.display = 'block';
-    }
-    
-    if (!state || !goal) return;
-    
-    // Use California medications for CA, regular medications for all other states
-    const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
-    
-    // Filter by category first
-    let filteredMedications = medList.filter(med => med.category === goal);
-    
-    // NOW FILTER BY PHARMACY RESTRICTIONS
-    const allowedPharmacies = STATE_CONFIGS[state]?.pharmacies || [];
-    
-    filteredMedications = filteredMedications.filter(med => {
-        // If pharmacy is empty, blank, or "ALL", it's available everywhere
-        if (!med.pharmacy || med.pharmacy === '' || med.pharmacy === 'ALL') {
-            return true;
-        }
-        
-        // Check if this medication's pharmacy ships to this state
-        const medPharmacies = med.pharmacy.split(' / ').map(p => p.trim());
-        return medPharmacies.some(pharmacy => 
-            allowedPharmacies.includes(pharmacy)
-        );
-    });
-      
-    displayResults(filteredMedications, state, goal);
+          const state = document.getElementById('state-select').value;
+          const goal = document.getElementById('goal-select').value;
+          const splashImage = document.getElementById('splash-image');
+
+  // Show/hide splash image based on dropdown selection
+          if (splashImage) {
+             if (state && goal) {
+               splashImage.classList.add('hidden');
+             } else {
+               splashImage.classList.remove('hidden');
+             }
+          }
+
+  // Bail if either dropdown is empty
+  if (!state || !goal) return;
+
+  const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
+
+  let filteredMedications = medList.filter(med => med.category === goal);
+  const allowedPharmacies = STATE_CONFIGS[state]?.pharmacies || [];
+
+  filteredMedications = filteredMedications.filter(med => {
+    if (!med.pharmacy || med.pharmacy === '' || med.pharmacy === 'ALL') return true;
+    const medPharmacies = med.pharmacy.split(' / ').map(p => p.trim());
+    return medPharmacies.some(pharmacy => allowedPharmacies.includes(pharmacy));
+  });
+
+  displayResults(filteredMedications, state, goal);
 }
 
     function displayResults(medications, state, goal) {
