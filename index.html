@@ -607,31 +607,82 @@ function handleSearch() {
         evaluationMessage.style.display = medications.length > 0 ? 'block' : 'none';
     }
 
-    // CREATE MEDICATIONS CONTAINER - ADD ALL THE REST OF YOUR CODE HERE
+    // Get medications container
     const medicationsContainer = document.getElementById('medications-list');
-        (() => {
-            const container = document.createElement('div');
-            container.id = 'medications-container';
-            resultsSection.appendChild(container);
-            return container;
-        })();
-
+    
     // Clear previous results
     medicationsContainer.innerHTML = '';
 
-    // [REST OF YOUR MEDICATION DISPLAY CODE CONTINUES HERE...]
-}
-        // Add submit button at top
-        const submitButtonHtml = `
-            <div id="submit-interest-section" style="margin-bottom: 20px; text-align: center;">
-                <button id="submit-interest-btn" onclick="showSubmissionForm()" 
-                        style="background-color: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-right: 10px;">
-                    Submit Interest in Selected Medications
-                </button>
-                <span id="selected-count" style="color: #666; font-size: 14px;">0 medications selected</span>
+    // Add submit button at top
+    const submitButtonHtml = `
+        <div id="submit-interest-section" style="margin-bottom: 20px; text-align: center;">
+            <button id="submit-interest-btn" onclick="showSubmissionForm()" 
+                    style="background-color: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-right: 10px;">
+                Submit Interest in Selected Medications
+            </button>
+            <span id="selected-count" style="color: #666; font-size: 14px;">0 medications selected</span>
+        </div>
+    `;
+    medicationsContainer.innerHTML = submitButtonHtml;
+
+    // Create medication cards with checkboxes
+    medications.forEach((med, index) => {
+        const medId = `med_${state}_${goal}_${index}`;
+        
+        const medicationCard = document.createElement('div');
+        medicationCard.style.cssText = `
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            background-color: #f9f9f9;
+            position: relative;
+        `;
+
+        medicationCard.innerHTML = `
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                <input type="checkbox" id="${medId}" onchange="toggleMedication('${medId}', '${med.medication.replace(/'/g, "\\'")}', '${med.price}')" 
+                       style="margin-top: 4px; transform: scale(1.2);">
+                <div style="flex: 1;">
+                    <h3 style="margin: 0 0 8px 0; color: #333; font-size: 18px;">${med.medication}</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-bottom: 12px;">
+                        ${med.type ? `<p style="margin: 0;"><strong>Type:</strong> ${med.type}</p>` : ''}
+                        ${med.strength ? `<p style="margin: 0;"><strong>Strength:</strong> ${med.strength}</p>` : ''}
+                        ${med.quantity ? `<p style="margin: 0;"><strong>Quantity:</strong> ${med.quantity}</p>` : ''}
+                        ${med.price ? `<p style="margin: 0;"><strong>Price:</strong> ${med.price}</p>` : ''}
+                        ${med.duration ? `<p style="margin: 0;"><strong>Duration:</strong> ${med.duration}</p>` : ''}
+                        ${med.pharmacy ? `<p style="margin: 0;"><strong>Pharmacy:</strong> ${med.pharmacy}</p>` : ''}
+                    </div>
+                    ${med.dosing ? `<p style="margin: 8px 0;"><strong>Dosing:</strong> ${med.dosing}</p>` : ''}
+                    ${med.description ? `<p style="margin: 8px 0; color: #666; line-height: 1.4;">${med.description}</p>` : ''}
+                </div>
             </div>
         `;
-        medicationsContainer.innerHTML = submitButtonHtml;
+
+        medicationsContainer.appendChild(medicationCard);
+    });
+
+    // Add bottom submit button
+    const bottomSubmitHtml = `
+        <div style="margin-top: 20px; text-align: center; padding: 20px; border-top: 2px solid #eee;">
+            <button onclick="showSubmissionForm()" 
+                    style="background-color: #28a745; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 18px; cursor: pointer;">
+                Submit Interest in Selected Medications
+            </button>
+        </div>
+    `;
+    medicationsContainer.innerHTML += bottomSubmitHtml;
+}// Add submit button at top
+const submitButtonHtml = `
+    <div id="submit-interest-section" style="margin-bottom: 20px; text-align: center;">
+        <button id="submit-interest-btn" onclick="showSubmissionForm()" 
+                style="background-color: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-right: 10px;">
+            Submit Interest in Selected Medications
+        </button>
+        <span id="selected-count" style="color: #666; font-size: 14px;">0 medications selected</span>
+    </div>
+`;
+medicationsContainer.innerHTML = submitButtonHtml;
 
         // Create medication cards with checkboxes
         medications.forEach((med, index) => {
