@@ -569,58 +569,58 @@ function handleSearch() {
 }
 
     function displayResults(medications, state, goal) {
-        const resultsSection = document.getElementById('results-section');
-        const noResultsSection = document.getElementById('no-results');
-        const dataStatus = document.getElementById('data-status');
-        const medCount = document.getElementById('med-count');
-        const selectGoalMessage = document.getElementById('select-goal-message');
-        
-        // Store current selection info
-        currentState = state;
-        currentGoal = goal;
-        
-        // Hide select goal message
-        if (selectGoalMessage) selectGoalMessage.classList.add('hidden');
-        
-        if (medications.length === 0) {
-            if (resultsSection) resultsSection.classList.add('hidden');
-            if (noResultsSection) noResultsSection.classList.remove('hidden');
-            if (dataStatus && medCount) {
-                dataStatus.classList.remove('hidden');
-                medCount.textContent = `No medications available for ${goal} in ${state}`;
-            }
-            return;
-        }
-
-        // Show results section
-        if (resultsSection) resultsSection.classList.remove('hidden');
-        if (noResultsSection) noResultsSection.classList.add('hidden');
-        
+    const resultsSection = document.getElementById('results-section');
+    const noResultsSection = document.getElementById('no-results');
+    const dataStatus = document.getElementById('data-status');
+    const medCount = document.getElementById('med-count');
+    const selectGoalMessage = document.getElementById('select-goal-message');
+    
+    // Store current selection info
+    currentState = state;
+    currentGoal = goal;
+    
+    // Hide select goal message
+    if (selectGoalMessage) selectGoalMessage.classList.add('hidden');
+    
+    if (medications.length === 0) {
+        if (resultsSection) resultsSection.classList.add('hidden');
+        if (noResultsSection) noResultsSection.classList.remove('hidden');
         if (dataStatus && medCount) {
-           dataStatus.classList.remove('hidden');
-           medCount.textContent = `Found ${medications.length} medication${medications.length === 1 ? '' : 's'} for ${goal} in ${state}`;
+            dataStatus.classList.remove('hidden');
+            medCount.textContent = `No medications available for ${goal} in ${state}`;
         }
+        return;
+    }
 
-        // Show evaluation message when medications are displayed
-            const evaluationMessage = document.getElementById('evaluation-message');
-        if (evaluationMessage) {
-           evaluationMessage.style.display = medications.length > 0 ? 'block' : 'none';
-        }
+    // Show results section
+    if (resultsSection) resultsSection.classList.remove('hidden');
+    if (noResultsSection) noResultsSection.classList.add('hidden');
+    
+    if (dataStatus && medCount) {
+        dataStatus.classList.remove('hidden');
+        medCount.textContent = `Found ${medications.length} medication${medications.length === 1 ? '' : 's'} for ${goal} in ${state}`;
+    }
+    
+    // Show evaluation message when medications are displayed
+    const evaluationMessage = document.getElementById('evaluation-message');
+    if (evaluationMessage) {
+        evaluationMessage.style.display = medications.length > 0 ? 'block' : 'none';
+    }
 
+    // CREATE MEDICATIONS CONTAINER - ADD ALL THE REST OF YOUR CODE HERE
+    const medicationsContainer = document.getElementById('medications-container') || 
+        (() => {
+            const container = document.createElement('div');
+            container.id = 'medications-container';
+            resultsSection.appendChild(container);
+            return container;
+        })();
+
+    // Clear previous results
+    medicationsContainer.innerHTML = '';
+
+    // [REST OF YOUR MEDICATION DISPLAY CODE CONTINUES HERE...]
 }
-
-        // Create medications container
-        const medicationsContainer = document.getElementById('medications-container') || 
-            (() => {
-                const container = document.createElement('div');
-                container.id = 'medications-container';
-                resultsSection.appendChild(container);
-                return container;
-            })();
-
-        // Clear previous results
-        medicationsContainer.innerHTML = '';
-
         // Add submit button at top
         const submitButtonHtml = `
             <div id="submit-interest-section" style="margin-bottom: 20px; text-align: center;">
