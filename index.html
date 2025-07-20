@@ -594,9 +594,15 @@ function handleSearch() {
         if (noResultsSection) noResultsSection.classList.add('hidden');
         
         if (dataStatus && medCount) {
-            dataStatus.classList.remove('hidden');
-            medCount.textContent = `Found ${medications.length} medication${medications.length === 1 ? '' : 's'} for ${goal} in ${state}`;
-        }
+           dataStatus.classList.remove('hidden');
+           medCount.textContent = `Found ${medications.length} medication${medications.length === 1 ? '' : 's'} for ${goal} in ${state}`;
+    
+    // Show evaluation message when medications are displayed
+    const evaluationMessage = document.getElementById('evaluation-message');
+    if (evaluationMessage) {
+        evaluationMessage.style.display = medications.length > 0 ? 'block' : 'none';
+    }
+}
 
         // Create medications container
         const medicationsContainer = document.getElementById('medications-container') || 
