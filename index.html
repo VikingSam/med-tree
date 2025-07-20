@@ -599,12 +599,14 @@ function handleSearch() {
         if (dataStatus && medCount) {
            dataStatus.classList.remove('hidden');
            medCount.textContent = `Found ${medications.length} medication${medications.length === 1 ? '' : 's'} for ${goal} in ${state}`;
-    
-    // Show evaluation message when medications are displayed
-    const evaluationMessage = document.getElementById('evaluation-message');
-    if (evaluationMessage) {
-        evaluationMessage.style.display = medications.length > 0 ? 'block' : 'none';
-    }
+        }
+
+        // Show evaluation message when medications are displayed
+            const evaluationMessage = document.getElementById('evaluation-message');
+        if (evaluationMessage) {
+           evaluationMessage.style.display = medications.length > 0 ? 'block' : 'none';
+        }
+
 }
 
         // Create medications container
