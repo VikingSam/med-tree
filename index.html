@@ -534,11 +534,21 @@
         }
     }
 
-    function handleSearch() {
-        const state = document.getElementById('state-select').value;
-        const goal = document.getElementById('goal-select').value;
-        
-        if (!state || !goal) return;
+          function handleSearch() {
+          const state = document.getElementById('state-select').value;
+          const goal = document.getElementById('goal-select').value;
+          const splashImage = document.getElementById('splash-image');
+    
+    // Handle splash image visibility
+          if (splashImage) {
+          if (state && goal) {
+            splashImage.classList.add('hidden');
+          } else {
+             splashImage.classList.remove('hidden');
+          }
+    }
+    
+          if (!state || !goal) return;
         
         // Use California medications for CA, regular medications for all other states
         const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
