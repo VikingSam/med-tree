@@ -470,70 +470,49 @@
     ];
 
     function init() {
-        console.log('Initializing app...');
+    console.log('Initializing app...');
+    
+    const stateSelect = document.getElementById('state-select');
+    const goalSelect = document.getElementById('goal-select');
+    
+    if (stateSelect && goalSelect) {
+        // Populate states
+        Object.keys(STATE_CONFIGS).sort().forEach(state => {
+            const option = document.createElement('option');
+            option.value = state;
+            option.textContent = state;
+            stateSelect.appendChild(option);
+        });
         
-        const stateSelect = document.getElementById('state-select');
-        const goalSelect = document.getElementById('goal-select');
+        // Populate goals
+        PATIENT_GOALS.forEach(goal => {
+            const option = document.createElement('option');
+            option.value = goal;
+            option.textContent = goal;
+            goalSelect.appendChild(option);
+        });
         
-        if (stateSelect && goalSelect) {
-            // Populate states
-            Object.keys(STATE_CONFIGS).sort().forEach(state => {
-                const option = document.createElement('option');
-                option.value = state;
-                option.textContent = state;
-                stateSelect.appendChild(option);
-            });
+        // Event listeners
+        stateSelect.addEventListener('change', function() {
+            if (this.value) {
+                goalSelect.disabled = false;
+            } else {
+                goalSelect.disabled = true;
+                goalSelect.value = '';
+            }
             
-            // Populate goals
-            PATIENT_GOALS.forEach(goal => {
-                const option = document.createElement('option');
-                option.value = goal;
-                option.textContent = goal;
-                goalSelect.appendChild(option);
-            });
-            
-            // Event listeners
-            stateSelect.addEventListener('change', function() {
-                if (this.value) {
-                    goalSelect.disabled = false;
-                } else {
-                    goalSelect.disabled = true;
-                    goalSelect.value = '';
-                }
-                
-                // Simple splash image logic
-                const splashImage = document.getElementById('splash-image');
-                if (splashImage) {
-                    if (this.value && goalSelect.value) {
-                        splashImage.classList.add('hidden');
-                    } else {
-                        splashImage.classList.remove('hidden');
-                    }
-                }
-                
-                handleSearch();
-            });
-            
-            goalSelect.addEventListener('change', function() {
-                // Simple splash image logic
-                const splashImage = document.getElementById('splash-image');
-                if (splashImage) {
-                    if (stateSelect.value && this.value) {
-                        splashImage.classList.add('hidden');
-                    } else {
-                        splashImage.classList.remove('hidden');
-                    }
-                }
-                
-                handleSearch();
-            });
-            
-            console.log('App initialized successfully');
-        } else {
-            console.error('Required elements not found');
-        }
+            handleSearch();
+        });
+        
+        goalSelect.addEventListener('change', function() {
+            handleSearch();
+        });
+        
+        console.log('App initialized successfully');
+    } else {
+        console.error('Required elements not found');
     }
-
+}
           function handleSearch() {
           const state = document.getElementById('state-select').value;
           const goal = document.getElementById('goal-select').value;
