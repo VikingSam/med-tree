@@ -324,16 +324,14 @@
     </div>
   </div>
 
-      <!-- ADD THIS SECTION HERE ↓↓↓ -->
-     <div class="main-content">
-      <div class="container">
+  <div class="main-content">
+    <div class="container">
       <div id="data-status" class="alert hidden">
-    <p><strong>Status:</strong> <span id="med-count">Select a state and patient goal to view available medications</span></p>
-    <p id="evaluation-message" style="margin-top: 10px; font-size: 0.9rem; color: #555; display: none;">
-        If you'd like to learn more about any of the options listed, check the box next to it.
-    </p>
-</div>
-      <!-- ADD THIS SECTION HERE ↑↑↑ -->
+        <p><strong>Status:</strong> <span id="med-count">Select a state and patient goal to view available medications</span></p>
+        <p id="evaluation-message" style="margin-top: 10px; font-size: 0.9rem; color: #555; display: none;">
+            If you'd like to learn more about any of the options listed, check the box next to it.
+        </p>
+      </div>
   
       <p id="select-goal-message" class="text-muted hidden">Please select a patient goal to view available medications.</p>
 
@@ -358,9 +356,8 @@
     let currentGoal = '';
 
     // EmailJS configuration
-  const EMAIL_SERVICE_ID = 'service_3foq4ae'; // Replace with your service ID
-  const EMAIL_TEMPLATE_ID = 'medication_interest';
-  
+    const EMAIL_SERVICE_ID = 'service_3foq4ae'; // Replace with your service ID
+    const EMAIL_TEMPLATE_ID = 'medication_interest';
 
     // Configuration
     const STATE_CONFIGS = {
@@ -473,216 +470,157 @@
     ];
 
     function init() {
-    console.log('Initializing app...');
-    
-    const stateSelect = document.getElementById('state-select');
-    const goalSelect = document.getElementById('goal-select');
-    
-    if (stateSelect && goalSelect) {
-        // Populate states
-        Object.keys(STATE_CONFIGS).sort().forEach(state => {
-            const option = document.createElement('option');
-            option.value = state;
-            option.textContent = state;
-            stateSelect.appendChild(option);
-        });
+        console.log('Initializing app...');
         
-        // Populate goals
-        PATIENT_GOALS.forEach(goal => {
-            const option = document.createElement('option');
-            option.value = goal;
-            option.textContent = goal;
-            goalSelect.appendChild(option);
-        });
+        const stateSelect = document.getElementById('state-select');
+        const goalSelect = document.getElementById('goal-select');
         
-        // Event listeners
-        stateSelect.addEventListener('change', function() {
-            if (this.value) {
-                goalSelect.disabled = false;
-            } else {
-                goalSelect.disabled = true;
-                goalSelect.value = '';
-            }
+        if (stateSelect && goalSelect) {
+            // Populate states
+            Object.keys(STATE_CONFIGS).sort().forEach(state => {
+                const option = document.createElement('option');
+                option.value = state;
+                option.textContent = state;
+                stateSelect.appendChild(option);
+            });
             
-            // Simple splash image logic
-            const splashImage = document.getElementById('splash-image');
-            if (splashImage) {
-                if (this.value && goalSelect.value) {
-                    splashImage.classList.add('hidden');
+            // Populate goals
+            PATIENT_GOALS.forEach(goal => {
+                const option = document.createElement('option');
+                option.value = goal;
+                option.textContent = goal;
+                goalSelect.appendChild(option);
+            });
+            
+            // Event listeners
+            stateSelect.addEventListener('change', function() {
+                if (this.value) {
+                    goalSelect.disabled = false;
                 } else {
-                    splashImage.classList.remove('hidden');
+                    goalSelect.disabled = true;
+                    goalSelect.value = '';
                 }
-            }
-            
-            handleSearch();
-        });
-        
-        goalSelect.addEventListener('change', function() {
-            // Simple splash image logic
-            const splashImage = document.getElementById('splash-image');
-            if (splashImage) {
-                if (stateSelect.value && this.value) {
-                    splashImage.classList.add('hidden');
-                } else {
-                    splashImage.classList.remove('hidden');
+                
+                // Simple splash image logic
+                const splashImage = document.getElementById('splash-image');
+                if (splashImage) {
+                    if (this.value && goalSelect.value) {
+                        splashImage.classList.add('hidden');
+                    } else {
+                        splashImage.classList.remove('hidden');
+                    }
                 }
-            }
+                
+                handleSearch();
+            });
             
-            handleSearch();
-        });
-        
-        console.log('App initialized successfully');
-    } else {
-        console.error('Required elements not found');
-    }
-}
-
-function handleSearch() {
-    const state = document.getElementById('state-select').value;
-    const goal = document.getElementById('goal-select').value;
-    
-    if (!state || !goal) return;
-    
-    // Use California medications for CA, regular medications for all other states
-    const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
-    
-    // Filter by category first
-    let filteredMedications = medList.filter(med => med.category === goal);
-    
-    // NOW FILTER BY PHARMACY RESTRICTIONS
-    const allowedPharmacies = STATE_CONFIGS[state]?.pharmacies || [];
-    
-    filteredMedications = filteredMedications.filter(med => {
-        // If pharmacy is empty, blank, or "ALL", it's available everywhere
-        if (!med.pharmacy || med.pharmacy === '' || med.pharmacy === 'ALL') {
-            return true;
+            goalSelect.addEventListener('change', function() {
+                // Simple splash image logic
+                const splashImage = document.getElementById('splash-image');
+                if (splashImage) {
+                    if (stateSelect.value && this.value) {
+                        splashImage.classList.add('hidden');
+                    } else {
+                        splashImage.classList.remove('hidden');
+                    }
+                }
+                
+                handleSearch();
+            });
+            
+            console.log('App initialized successfully');
+        } else {
+            console.error('Required elements not found');
         }
+    }
+
+    function handleSearch() {
+        const state = document.getElementById('state-select').value;
+        const goal = document.getElementById('goal-select').value;
         
-        // Check if this medication's pharmacy ships to this state
-        const medPharmacies = med.pharmacy.split(' / ').map(p => p.trim());
-        return medPharmacies.some(pharmacy => 
-            allowedPharmacies.includes(pharmacy)
-        );
-    });
-      
-    displayResults(filteredMedications, state, goal);
-}
+        if (!state || !goal) return;
+        
+        // Use California medications for CA, regular medications for all other states
+        const medList = state === 'California' ? CA_MEDICATIONS : VIKING_MEDICATIONS;
+        
+        // Filter by category first
+        let filteredMedications = medList.filter(med => med.category === goal);
+        
+        // NOW FILTER BY PHARMACY RESTRICTIONS
+        const allowedPharmacies = STATE_CONFIGS[state]?.pharmacies || [];
+        
+        filteredMedications = filteredMedications.filter(med => {
+            // If pharmacy is empty, blank, or "ALL", it's available everywhere
+            if (!med.pharmacy || med.pharmacy === '' || med.pharmacy === 'ALL') {
+                return true;
+            }
+            
+            // Check if this medication's pharmacy ships to this state
+            const medPharmacies = med.pharmacy.split(' / ').map(p => p.trim());
+            return medPharmacies.some(pharmacy => 
+                allowedPharmacies.includes(pharmacy)
+            );
+        });
+          
+        displayResults(filteredMedications, state, goal);
+    }
 
     function displayResults(medications, state, goal) {
-    const resultsSection = document.getElementById('results-section');
-    const noResultsSection = document.getElementById('no-results');
-    const dataStatus = document.getElementById('data-status');
-    const medCount = document.getElementById('med-count');
-    const selectGoalMessage = document.getElementById('select-goal-message');
-    
-    // Store current selection info
-    currentState = state;
-    currentGoal = goal;
-    
-    // Hide select goal message
-    if (selectGoalMessage) selectGoalMessage.classList.add('hidden');
-    
-    if (medications.length === 0) {
-        if (resultsSection) resultsSection.classList.add('hidden');
-        if (noResultsSection) noResultsSection.classList.remove('hidden');
+        const resultsSection = document.getElementById('results-section');
+        const noResultsSection = document.getElementById('no-results');
+        const dataStatus = document.getElementById('data-status');
+        const medCount = document.getElementById('med-count');
+        const selectGoalMessage = document.getElementById('select-goal-message');
+        
+        // Store current selection info
+        currentState = state;
+        currentGoal = goal;
+        
+        // Hide select goal message
+        if (selectGoalMessage) selectGoalMessage.classList.add('hidden');
+        
+        if (medications.length === 0) {
+            if (resultsSection) resultsSection.classList.add('hidden');
+            if (noResultsSection) noResultsSection.classList.remove('hidden');
+            if (dataStatus && medCount) {
+                dataStatus.classList.remove('hidden');
+                medCount.textContent = `No medications available for ${goal} in ${state}`;
+            }
+            return;
+        }
+
+        // Show results section
+        if (resultsSection) resultsSection.classList.remove('hidden');
+        if (noResultsSection) noResultsSection.classList.add('hidden');
+        
         if (dataStatus && medCount) {
             dataStatus.classList.remove('hidden');
-            medCount.textContent = `No medications available for ${goal} in ${state}`;
+            medCount.textContent = `Found ${medications.length} medication${medications.length === 1 ? '' : 's'} for ${goal} in ${state}`;
         }
-        return;
-    }
-
-    // Show results section
-    if (resultsSection) resultsSection.classList.remove('hidden');
-    if (noResultsSection) noResultsSection.classList.add('hidden');
-    
-    if (dataStatus && medCount) {
-        dataStatus.classList.remove('hidden');
-        medCount.textContent = `Found ${medications.length} medication${medications.length === 1 ? '' : 's'} for ${goal} in ${state}`;
-    }
-    
-    // Show evaluation message when medications are displayed
-    const evaluationMessage = document.getElementById('evaluation-message');
-    if (evaluationMessage) {
-        evaluationMessage.style.display = medications.length > 0 ? 'block' : 'none';
-    }
-
-    // Get medications container
-    const medicationsContainer = document.getElementById('medications-list');
-    
-    // Clear previous results
-    medicationsContainer.innerHTML = '';
-
-    // Add submit button at top
-    const submitButtonHtml = `
-        <div id="submit-interest-section" style="margin-bottom: 20px; text-align: center;">
-            <button id="submit-interest-btn" onclick="showSubmissionForm()" 
-                    style="background-color: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-right: 10px;">
-                Submit Interest in Selected Medications
-            </button>
-            <span id="selected-count" style="color: #666; font-size: 14px;">0 medications selected</span>
-        </div>
-    `;
-    medicationsContainer.innerHTML = submitButtonHtml;
-
-    // Create medication cards with checkboxes
-    medications.forEach((med, index) => {
-        const medId = `med_${state}_${goal}_${index}`;
         
-        const medicationCard = document.createElement('div');
-        medicationCard.style.cssText = `
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-            background-color: #f9f9f9;
-            position: relative;
-        `;
+        // Show evaluation message when medications are displayed
+        const evaluationMessage = document.getElementById('evaluation-message');
+        if (evaluationMessage) {
+            evaluationMessage.style.display = medications.length > 0 ? 'block' : 'none';
+        }
 
-        medicationCard.innerHTML = `
-            <div style="display: flex; align-items: flex-start; gap: 12px;">
-                <input type="checkbox" id="${medId}" onchange="toggleMedication('${medId}', '${med.medication.replace(/'/g, "\\'")}', '${med.price}')" 
-                       style="margin-top: 4px; transform: scale(1.2);">
-                <div style="flex: 1;">
-                    <h3 style="margin: 0 0 8px 0; color: #333; font-size: 18px;">${med.medication}</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-bottom: 12px;">
-                        ${med.type ? `<p style="margin: 0;"><strong>Type:</strong> ${med.type}</p>` : ''}
-                        ${med.strength ? `<p style="margin: 0;"><strong>Strength:</strong> ${med.strength}</p>` : ''}
-                        ${med.quantity ? `<p style="margin: 0;"><strong>Quantity:</strong> ${med.quantity}</p>` : ''}
-                        ${med.price ? `<p style="margin: 0;"><strong>Price:</strong> ${med.price}</p>` : ''}
-                        ${med.duration ? `<p style="margin: 0;"><strong>Duration:</strong> ${med.duration}</p>` : ''}
-                        ${med.pharmacy ? `<p style="margin: 0;"><strong>Pharmacy:</strong> ${med.pharmacy}</p>` : ''}
-                    </div>
-                    ${med.dosing ? `<p style="margin: 8px 0;"><strong>Dosing:</strong> ${med.dosing}</p>` : ''}
-                    ${med.description ? `<p style="margin: 8px 0; color: #666; line-height: 1.4;">${med.description}</p>` : ''}
-                </div>
+        // Get medications container
+        const medicationsContainer = document.getElementById('medications-list');
+        
+        // Clear previous results
+        medicationsContainer.innerHTML = '';
+
+        // Add submit button at top
+        const submitButtonHtml = `
+            <div id="submit-interest-section" style="margin-bottom: 20px; text-align: center;">
+                <button id="submit-interest-btn" onclick="showSubmissionForm()" 
+                        style="background-color: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-right: 10px;">
+                    Submit Interest in Selected Medications
+                </button>
+                <span id="selected-count" style="color: #666; font-size: 14px;">0 medications selected</span>
             </div>
         `;
-
-        medicationsContainer.appendChild(medicationCard);
-    });
-
-    // Add bottom submit button
-    const bottomSubmitHtml = `
-        <div style="margin-top: 20px; text-align: center; padding: 20px; border-top: 2px solid #eee;">
-            <button onclick="showSubmissionForm()" 
-                    style="background-color: #28a745; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 18px; cursor: pointer;">
-                Submit Interest in Selected Medications
-            </button>
-        </div>
-    `;
-    medicationsContainer.innerHTML += bottomSubmitHtml;
-}// Add submit button at top
-const submitButtonHtml = `
-    <div id="submit-interest-section" style="margin-bottom: 20px; text-align: center;">
-        <button id="submit-interest-btn" onclick="showSubmissionForm()" 
-                style="background-color: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-right: 10px;">
-            Submit Interest in Selected Medications
-        </button>
-        <span id="selected-count" style="color: #666; font-size: 14px;">0 medications selected</span>
-    </div>
-`;
-medicationsContainer.innerHTML = submitButtonHtml;
+        medicationsContainer.innerHTML = submitButtonHtml;
 
         // Create medication cards with checkboxes
         medications.forEach((med, index) => {
@@ -731,6 +669,7 @@ medicationsContainer.innerHTML = submitButtonHtml;
             </div>
         `;
         medicationsContainer.innerHTML += bottomSubmitHtml;
+    }
 
     // Handle medication checkbox changes
     function toggleMedication(medId, medicationName, price) {
